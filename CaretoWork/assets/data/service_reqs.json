@@ -1,117 +1,78 @@
 [
   {
-    "id": "1",
-    "userID": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
-    "status": "NEW",
+    "reqid": "8B77987D9FD04542A97FB4AA897A8A39",
+    "providerid": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
+    "status": "ACCEPTED",
     "createdAt": "2022-04-16T18:56:21.890Z",
     "updatedAt": "2022-04-16T18:56:21.890Z",
-    "orderRestaurantId": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-    "Restaurant": {
-      "id": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-      "name": "El Cabo Coffe Bar Tres De Mayo",
-      "image": "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/uber-eats/restaurant1.jpeg",
-      "deliveryFee": 0.039448871531492236,
-      "minDeliveryTime": 10,
-      "maxDeliveryTime": 44,
-      "rating": 1.5095123177204128,
-      "address": "983 Lewis Rapids",
-      "lat": 46.87190499528364,
-      "lng": 28.54937769418778,
-      "createdAt": "2022-04-16T12:03:33.225Z",
-      "updatedAt": "2022-04-16T12:05:12.826Z"
-    },
-    "User": {
-      "id": "1",
-      "name": "Vadim",
-      "address": "Abc 1",
-      "lat": 46.86190499528364,
-      "lng": 28.54437769418778,
-      "rating": 5.0
-    }, 
-    "Services": 
-    [ 
-      {"id": "svc1",
-      "tags": 0,
-       "brief": "Personal Care",
-       "description": "N/A"
-      },
-      {"id": "svc2",
-       "tags": 1,
-       "brief": "Wound Care",
-       "description": "I injured myself on my knees and I would like to have a wound care"
-      }, 
-      {"id": "svc3",
-       "tags": 1,
-       "brief": "Nursing Assessment",
-       "description": "I need an assessment of my heart condition"
-      }
-    ],
-    "Client": {
-      "id": "1",
-      "name": "Alex Belair",
-      "address": "135 Tyndall Ave.",
-      "lat": 43.637720,
-      "lng": -79.428330,
-      "rating": 5.0, 
-      "image": "https://scontent-ord5-1.xx.fbcdn.net/v/t39.30808-6/272309388_10161765255723102_5193443378772765689_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=4Onc7y-Dhs0AX8VeVCk&_nc_ht=scontent-ord5-1.xx&oh=00_AT-sX3InuX6xN9t33TVQYj-2MxMMvjKhASCz6slvKK7X4Q&oe=62FC6D41"
-    }
-  },
-  {
-    "id": "2",
-    "userID": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
-    "status": "NEW",
-    "createdAt": "2022-04-16T18:53:32.261Z",
-    "updatedAt": "2022-04-16T18:53:32.261Z",
-    "orderRestaurantId": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-    "Restaurant": {
-      "id": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-      "name": "Jacobs - DuBuque",
-      "image": "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/uber-eats/restaurant1.jpeg",
-      "deliveryFee": 0.039448871531492236,
-      "minDeliveryTime": 10,
-      "maxDeliveryTime": 44,
-      "rating": 1.5095123177204128,
-      "address": "983 Lewis Rapids",
-      "lat": 46.87190499528364,
-      "lng": 28.54937769418778,
-      "createdAt": "2022-04-16T12:03:33.225Z",
-      "updatedAt": "2022-04-16T12:05:12.826Z"
-    },
-    "User": {
-      "id": "2",
-      "name": "Lukas",
-      "address": "Lithuania 1",
-      "lat": 46.86110499528364,
-      "lng": 28.54497769418778
-    }, 
     "Services": 
     [ 
       {"id": "svc1",
        "tags": 0,
-       "brief": "Personal Care",
-       "description": "N/A"
+       "brief": "Personal Care"
       },
       {"id": "svc2",
        "tags": 1,
-       "brief": "Wound Care",
-       "description": "I injured myself on my knees and I would like to have a wound care"
+       "brief": "Wound Care"
       }, 
       {"id": "svc3",
        "tags": 1,
-       "brief": "Nursing Assessment",
-       "description": "I need an assessment of my heart condition"
+       "brief": "Nursing Assessment"
+      }
+    ],
+    "Client": {
+      "id": "65621234-c794-4704-b468-dd4d39c2c4d8",
+      "name": "Alexander Belair",
+      "address": "135 Tyndall Ave.",
+      "lat": 43.637718,
+      "lng": -79.428329,
+      "rating": 4.80, 
+      "image": "https://i.ibb.co/wzDZmHt/65214598-10158632753688102-8820209946474840064-n.jpg"
+    }
+  },
+
+  {
+    "id": "2",
+    "status": "ACCEPTED",
+    "createdAt": "2022-04-16T18:53:32.261Z",
+    "updatedAt": "2022-04-16T18:53:32.261Z",
+    "Services": 
+    [ 
+      {"id": "svc1",
+       "tags": 0,
+       "brief": "Personal Care"
+      },
+      {"id": "svc2",
+       "tags": 1,
+       "brief": "Wound Care"
+      }, 
+      {"id": "svc3",
+       "tags": 1,
+       "brief": "Nursing Assessment"
       }
     ],
     "Client": {
       "id": "2",
+      "self": "True",
       "name": "Yang Yang",
-      "address": "1 Changsheng Rd. ",
+      "clientname": "Yang Yang",
+      "gender": "Female",
+      "DOB": "1981/10/16",
+      "language": "Mandarin (简体中文), Wu (吴语)",
+      "allergies": "None",
+      "address": "1 Changsheng Road, Building 66",
       "lat": 43.637720,
       "lng": -79.428330,
+      "contact": "+86 13857310895",
       "rating": 5.0,
       "image": "https://i.ibb.co/W5xfmZt/mmexport1660353401551.jpg"
+    },
+    "RequestDetails": {
+      "time": "2022/08/21/15:00 PM",
+      "description": "I need an assessment of my heart condition, and would also like some help in meal prep. I injured my knees and would like some wound care. "
     }
   },
+
   {
     "id": "3",
     "userID": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
@@ -195,13 +156,6 @@
       "createdAt": "2022-04-16T12:03:33.225Z",
       "updatedAt": "2022-04-16T12:05:12.826Z"
     },
-    "User": {
-      "id": "3",
-      "name": "Alex",
-      "address": "Happy land",
-      "lat": 46.86133499528364,
-      "lng": 28.54421769418778
-    }, 
     "Services": 
     [ 
       {"id": "svc1",
@@ -221,15 +175,17 @@
       }
     ],
     "Client": {
-      "id": "1",
+      "id": "4",
       "name": "Henry Tian",
       "address": "696 Dundas St. West",
       "lat": 43.637720,
       "lng": -79.428330,
+      "contact": "647-706-7484",
       "rating": 5.0,
       "image": "https://i.ibb.co/0qQQJsL/293633609-1150046248881773-3200801637312794189-n.png"
     }
   },
+
   {
     "id": "5",
     "userID": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
@@ -255,7 +211,7 @@
       "updatedAt": "2022-04-16T12:05:12.826Z"
     },
     "User": {
-      "id": "3",
+      "id": "5",
       "name": "Alex",
       "address": "Happy land",
       "lat": 46.86133499528364,
@@ -280,7 +236,7 @@
       }
     ],
     "Client": {
-      "id": "1",
+      "id": "5",
       "name": "Xuehua Fan",
       "address": "1 Changsheng Rd.",
       "lat": 43.637720,

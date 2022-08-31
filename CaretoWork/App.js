@@ -7,15 +7,21 @@ import srvcReqs from './assets/data/service_reqs.json'
 import SingleRequest from './src/components/SingleRequest';
 import RequestsScreen from "./src/screens/RequestsScreen";
 import RequestDetails from "./src/screens/RequestDetails";
+import Navigation from "./src/navigation";
+import { NavigationContainer } from "@react-navigation/native";
 
 const request = srvcReqs[0];
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <RequestDetails />
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <View style={styles.container}>
+        <Navigation />
+        {/* <RequestDetails /> */}
+        {/* <RequestsScreen /> */}
+        <StatusBar style="auto" />
+      </View>
+    </NavigationContainer>
   );
 }
 
@@ -26,7 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     // alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 50
+    paddingTop: 0
   },
   srvcbtn: {
     color: "#FFDE59",
