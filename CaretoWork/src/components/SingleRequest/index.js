@@ -18,7 +18,7 @@ const SingleRequest = ({ request }) => {
   
   const pressHandler = () => {
     navigation.navigate('RequestDetails', request);
-    console.log(request);
+    // console.log(request);
   }
 
   return (

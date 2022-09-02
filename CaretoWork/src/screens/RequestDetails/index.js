@@ -1,5 +1,5 @@
 import { useRef, useMemo } from "react";
-import { Dimensions, StyleSheet, Text, View, Image, useWindowDimensions } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, Image, useWindowDimensions, Pressable } from 'react-native';
 import BottomSheet from "@gorhom/bottom-sheet"
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import { FlatList } from 'react-native-gesture-handler'
@@ -24,7 +24,7 @@ const RequestDetails = () => {
   const srvc = route.params;
   const { height, width } = useWindowDimensions();
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => [100, "85%"], []);
+  const snapPoints = useMemo(() => ["100%"], []);
 
   const namewidth = SCREEN_WIDTH * 0.75 / srvc.Client.clientname.length;
   let namesize;
@@ -45,26 +45,33 @@ const RequestDetails = () => {
     return age;
   }
 
-
+  const gobackHandler = () => {
+    navigation.navigate('RequestsScreen');
+  }
 
   const svcArray = srvc.Services.map(service => (
     <Text key={service.id} style={styles.srvcbtnsmall}>{service.brief}</Text>)
   );
 
   return (
-    <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
-      <MapView style={{ width, height }}
+    <GestureHandlerRootView style={{ backgroundColor: "white", flex: 1 }}>
+      {/* <MapView style={{ width, height }}
         showsUserLocation={true}
         followsUserLocation={true}
-      />
-      <BottomSheet ref={bottomSheetRef} snapPoints={snapPoints} handleIndicatorStyle={{ backgroundColor: "grey", width: 100 }}>
-        <ScrollView style={{ marginTop: 10, paddingHorizontal: '3%', backgroundColor: "white", borderRadius: 10}}>
-          <View style={styles.topbrief}>
+      /> */}
+      {/* <BottomSheet ref={bottomSheetRef} snapPoints={snapPoints} handleIndicatorStyle={{ backgroundColor: "grey", width: 0 }}> */}
+      <View style={{ marginTop: "4%" }}>
+        <View style={styles.topbrief}>
+          <Pressable onPress={gobackHandler} style={{width: "15%"}}>
+            <FontAwesome5 name="arrow-left" size={30} color="#001A72" style={{ marginHorizontal: 10 }} />
+          </Pressable>
+          <View style={{width: "85%", flexDirection: "row", alignItems: "center", justifyContent: "center"}}>
             <Text style={{ fontSize: 27, letterSpacing: 1 }}>14 min</Text>
             <FontAwesome5 name="hand-holding-medical" size={30} color="#001A72" style={{ marginHorizontal: 10 }} />
             <Text style={{ fontSize: 27, letterSpacing: 1 }}>5 km</Text>
           </View>
-
+        </View>
+        <ScrollView style={{ paddingHorizontal: '3%', backgroundColor: "white" }}>
           <View style={styles.client}>
             <View style={styles.clientphoto}>
               <Image source={{ uri: srvc.Client.image }} style={{ width: SCREEN_WIDTH * 0.33, height: SCREEN_WIDTH * 0.33, borderRadius: SCREEN_WIDTH * 0.18 }} />
@@ -118,7 +125,8 @@ const RequestDetails = () => {
           </View>
 
         </ScrollView>
-      </BottomSheet>
+      </View>
+      {/* </BottomSheet> */}
     </GestureHandlerRootView>
   );
 }
@@ -126,7 +134,7 @@ const RequestDetails = () => {
 const styles = StyleSheet.create({
   topbrief: {
     width: "100%",
-    marginTop: 10,
+    marginTop: 30,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center"
