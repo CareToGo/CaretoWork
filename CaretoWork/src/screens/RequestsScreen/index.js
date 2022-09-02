@@ -1,4 +1,4 @@
-import { useRef, memo, useMemo, useCallback, useState } from "react";
+import { useRef, memo, useMemo, useCallback, useState, useEffect } from "react";
 import { Text, View, Dimensions, useWindowDimensions, PermissionsAndroid } from 'react-native';
 import BottomSheet from "@gorhom/bottom-sheet"
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -6,21 +6,48 @@ import { FlatList } from 'react-native-gesture-handler'
 import srvcReqs from '../../../assets/data/service_reqs.json'
 import SingleRequest from "../../components/SingleRequest";
 import MapView, { Marker } from "react-native-maps";
-import { FontAwesome5 } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import * as Location from "expo-location";
+
+
 
 const RequestsScreen = () => {
+  const [HCPlocation, setHCPlocation] = useState();
   const bottomSheetRef = useRef(null);
   const { height, width } = useWindowDimensions();
-  const snapPoints = useMemo(() => ["16%", "85%"], []);
+  const snapPoints = useMemo(() => [100, "85%"], []);
+
+  useEffect(() => {
+    const getClientLocations = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (!status === 'granted') {
+        console.log("NONONO");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync();
+      setHCPlocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      });
+    }
+    getClientLocations();
+  }, [])
+
 
   return (
     <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
-      <MapView showsUserLocation={true} followsUserLocation={true} style={{ height, width }}>
-        <Marker title={"BelairCare"} description={"BelairCare Medical Company"} coordinate={{ latitude: 43.648411, longitude: -79.376472 }}>
-          <View style={{backgroundColor:"green", paddingVertical: 4, paddingHorizontal: 3, borderRadius: 20}}>
-            <FontAwesome5 name="hand-holding-medical" size={12} color="white" />
-          </View>
-        </Marker>
+      <MapView showsUserLocation={true} followsUserLocation={true} showsMyLocationButton={true} style={{ height, width }}>
+        {srvcReqs.map((req) => (
+          <Marker
+            key={req.reqid} title={req.Client.name} description={req.Client.address} 
+            coordinate={{ latitude: req.Client.lat, longitude: req.Client.lng }}
+          >
+            <View style={{ backgroundColor: "#001A72", padding: 10, borderRadius: 10 }}>
+              <MaterialIcons name="medical-services" size={30} color="white" />
+            </View>
+          </Marker>
+        ))}
       </MapView>
 
       <BottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
@@ -33,6 +60,7 @@ const RequestsScreen = () => {
           renderItem={({ item }) => <SingleRequest request={item} />}
         />
       </BottomSheet>
+
     </GestureHandlerRootView>
   );
 }

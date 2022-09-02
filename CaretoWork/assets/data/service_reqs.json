@@ -20,19 +20,31 @@
        "brief": "Nursing Assessment"
       }
     ],
+    "RequestDetails": {
+      "time": "2022/09/21/12:00 PM",
+      "description": "I need an assessment of my heart condition, and would also like some help in meal prep. I injured my knees and would like some wound care. "
+    },
     "Client": {
       "id": "65621234-c794-4704-b468-dd4d39c2c4d8",
+      "self": "True",
       "name": "Alexander Belair",
+      "clientname": "Alexander Belair",
+      "gender": "Male",
+      "DOB": "1996/06/08",
+      "language": "English, French, Troll",
+      "allergies": "Stupid Rules",
       "address": "135 Tyndall Ave.",
       "lat": 43.637718,
       "lng": -79.428329,
+      "contact": "+1 4163181502",
       "rating": 4.80, 
       "image": "https://i.ibb.co/wzDZmHt/65214598-10158632753688102-8820209946474840064-n.jpg"
     }
   },
 
   {
-    "id": "2",
+    "reqid": "2",
+    "providerid": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
     "status": "ACCEPTED",
     "createdAt": "2022-04-16T18:53:32.261Z",
     "updatedAt": "2022-04-16T18:53:32.261Z",
@@ -51,6 +63,10 @@
        "brief": "Nursing Assessment"
       }
     ],
+    "RequestDetails": {
+      "time": "2022/10/21/15:00 PM",
+      "description": "I need an assessment of my heart condition, and would also like some help in meal prep. I injured my knees and would like some wound care. "
+    },
     "Client": {
       "id": "2",
       "self": "True",
@@ -60,50 +76,21 @@
       "DOB": "1981/10/16",
       "language": "Mandarin (简体中文), Wu (吴语)",
       "allergies": "None",
-      "address": "1 Changsheng Road, Building 66",
-      "lat": 43.637720,
-      "lng": -79.428330,
+      "address": "210 Victoria Street, Unit 2109",
+      "lat": 43.654764,
+      "lng": -79.379132,
       "contact": "+86 13857310895",
       "rating": 5.0,
       "image": "https://i.ibb.co/W5xfmZt/mmexport1660353401551.jpg"
-    },
-    "RequestDetails": {
-      "time": "2022/08/21/15:00 PM",
-      "description": "I need an assessment of my heart condition, and would also like some help in meal prep. I injured my knees and would like some wound care. "
     }
   },
 
   {
-    "id": "3",
-    "userID": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
-    "status": "NEW",
+    "reqid": "3",
+    "providerid": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
+    "status": "ACCEPTED",
     "createdAt": "2022-04-16T18:56:49.713Z",
     "updatedAt": "2022-04-16T18:56:49.713Z",
-    "orderRestaurantId": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-    "_version": 1,
-    "_lastChangedAt": 1650135409734,
-    "_deleted": null,
-    "Restaurant": {
-      "id": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-      "name": "Jacobs - DuBuque",
-      "image": "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/uber-eats/restaurant1.jpeg",
-      "deliveryFee": 0.039448871531492236,
-      "minDeliveryTime": 10,
-      "maxDeliveryTime": 44,
-      "rating": 1.5095123177204128,
-      "address": "983 Lewis Rapids",
-      "lat": 46.87190499528364,
-      "lng": 28.54937769418778,
-      "createdAt": "2022-04-16T12:03:33.225Z",
-      "updatedAt": "2022-04-16T12:05:12.826Z"
-    },
-    "User": {
-      "id": "3",
-      "name": "Alex",
-      "address": "Happy land",
-      "lat": 46.86133499528364,
-      "lng": 28.54421769418778
-    }, 
     "Services": 
     [ 
       {"id": "svc1",
@@ -132,30 +119,13 @@
       "image": "https://i.ibb.co/DwYkzRr/mmexport1660353899012.jpg"
     }
   },
+
   {
-    "id": "4",
-    "userID": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
+    "reqid": "4",
+    "providerid": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
     "status": "NEW",
     "createdAt": "2022-04-16T18:56:49.713Z",
     "updatedAt": "2022-04-16T18:56:49.713Z",
-    "orderRestaurantId": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-    "_version": 1,
-    "_lastChangedAt": 1650135409734,
-    "_deleted": null,
-    "Restaurant": {
-      "id": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-      "name": "Jacobs - DuBuque",
-      "image": "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/uber-eats/restaurant1.jpeg",
-      "deliveryFee": 0.039448871531492236,
-      "minDeliveryTime": 10,
-      "maxDeliveryTime": 44,
-      "rating": 1.5095123177204128,
-      "address": "983 Lewis Rapids",
-      "lat": 46.87190499528364,
-      "lng": 28.54937769418778,
-      "createdAt": "2022-04-16T12:03:33.225Z",
-      "updatedAt": "2022-04-16T12:05:12.826Z"
-    },
     "Services": 
     [ 
       {"id": "svc1",
@@ -187,36 +157,11 @@
   },
 
   {
-    "id": "5",
-    "userID": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
+    "reqid": "5",
+    "providerid": "9b09b087-cf40-41f4-a375-8dc75843a8d1",
     "status": "NEW",
     "createdAt": "2022-04-16T18:56:49.713Z",
     "updatedAt": "2022-04-16T18:56:49.713Z",
-    "orderRestaurantId": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-    "_version": 1,
-    "_lastChangedAt": 1650135409734,
-    "_deleted": null,
-    "Restaurant": {
-      "id": "7d7965f7-1b33-4b8c-9bac-0c22bc905030",
-      "name": "Jacobs - DuBuque",
-      "image": "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/uber-eats/restaurant1.jpeg",
-      "deliveryFee": 0.039448871531492236,
-      "minDeliveryTime": 10,
-      "maxDeliveryTime": 44,
-      "rating": 1.5095123177204128,
-      "address": "983 Lewis Rapids",
-      "lat": 46.87190499528364,
-      "lng": 28.54937769418778,
-      "createdAt": "2022-04-16T12:03:33.225Z",
-      "updatedAt": "2022-04-16T12:05:12.826Z"
-    },
-    "User": {
-      "id": "5",
-      "name": "Alex",
-      "address": "Happy land",
-      "lat": 46.86133499528364,
-      "lng": 28.54421769418778
-    }, 
     "Services": 
     [ 
       {"id": "svc1",

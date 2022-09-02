@@ -15,8 +15,14 @@ const SingleRequest = ({ request }) => {
     <Text key={service.id} style={styles.srvcbtn}>{service.brief}</Text>)
   );
   const navigation = useNavigation();
+  
+  const pressHandler = () => {
+    navigation.navigate('RequestDetails', request);
+    console.log(request);
+  }
+
   return (
-      <Pressable style={styles.singlereq} onPress={() => navigation.navigate('RequestDetails', {reqid: request.id})}>
+      <Pressable style={styles.singlereq} onPress={pressHandler}>
         <Image source={{uri: request.Client.image}} style={{width: '35%', height: '100%',  borderTopLeftRadius: 10, borderBottomLeftRadius: 10}}/>
         <View style={{marginLeft: 10, marginRight: 10, flex: 1, width: '50%'}}>
           <Text style={{fontSize: 24, fontWeight: '600'}}>{request.Client.name}</Text>

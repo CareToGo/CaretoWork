@@ -1,5 +1,5 @@
 import { useRef, useMemo } from "react";
-import { Dimensions, StyleSheet, Text, View, Image } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, Image, useWindowDimensions } from 'react-native';
 import BottomSheet from "@gorhom/bottom-sheet"
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import { FlatList } from 'react-native-gesture-handler'
@@ -8,17 +8,23 @@ import SingleRequest from "../../components/SingleRequest";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialIcons } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
+import MapView from "react-native-maps";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-const srvc = srvcReqs[1];
 
 const {
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT,
 } = Dimensions.get('window');
 
-const RequestDetails = ( { route } ) => {
+
+const RequestDetails = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const srvc = route.params;
+  const { height, width } = useWindowDimensions();
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ["16%", "85%"], []);
+  const snapPoints = useMemo(() => [100, "85%"], []);
 
   const namewidth = SCREEN_WIDTH * 0.75 / srvc.Client.clientname.length;
   let namesize;
@@ -39,14 +45,20 @@ const RequestDetails = ( { route } ) => {
     return age;
   }
 
+
+
   const svcArray = srvc.Services.map(service => (
     <Text key={service.id} style={styles.srvcbtnsmall}>{service.brief}</Text>)
   );
 
   return (
     <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
+      <MapView style={{ width, height }}
+        showsUserLocation={true}
+        followsUserLocation={true}
+      />
       <BottomSheet ref={bottomSheetRef} snapPoints={snapPoints} handleIndicatorStyle={{ backgroundColor: "grey", width: 100 }}>
-        <ScrollView style={{marginTop: 10, paddingHorizontal: '3%'}}>
+        <ScrollView style={{ marginTop: 10, paddingHorizontal: '3%', backgroundColor: "white", borderRadius: 10}}>
           <View style={styles.topbrief}>
             <Text style={{ fontSize: 27, letterSpacing: 1 }}>14 min</Text>
             <FontAwesome5 name="hand-holding-medical" size={30} color="#001A72" style={{ marginHorizontal: 10 }} />
@@ -88,20 +100,20 @@ const RequestDetails = ( { route } ) => {
             <View style={{ width: "100%", marginTop: 20 }}>
               <Text numberOfLines={1} style={{ fontWeight: "500", fontSize: 21, width: "100%" }}>Client Message: </Text>
             </View>
-            <View style={{ width: "100%", marginTop: 2, borderWidth: 2, borderColor:"lightgrey", borderRadius: 10, padding: 10}}>
+            <View style={{ width: "100%", marginTop: 2, borderWidth: 2, borderColor: "lightgrey", borderRadius: 10, padding: 10 }}>
               <Text style={{ fontSize: 15, color: "grey" }}>{srvc.RequestDetails.description}</Text>
             </View>
           </View>
 
-          <View style={{marginTop: 20, backgroundColor:"#3FC060", width: "100%", height: 60, borderRadius: 15, textAlign:"center", justifyContent: 'center'}}>
-            <Text style={{textAlign: "center", fontSize: 21, color: "white"}}>Accept Request</Text>
+          <View style={{ marginTop: 20, backgroundColor: "#3FC060", width: "100%", height: 60, borderRadius: 15, textAlign: "center", justifyContent: 'center' }}>
+            <Text style={{ textAlign: "center", fontSize: 21, color: "white" }}>Accept Request</Text>
           </View>
 
-          <View style={{marginTop: 20, backgroundColor:"#ff6666", width: "100%", height: 60, borderRadius: 15, textAlign:"center", justifyContent: 'center'}}>
-            <Text style={{textAlign: "center", fontSize: 21, color: "white"}}>Decline Request</Text>
+          <View style={{ marginTop: 20, backgroundColor: "#ff6666", width: "100%", height: 60, borderRadius: 15, textAlign: "center", justifyContent: 'center' }}>
+            <Text style={{ textAlign: "center", fontSize: 21, color: "white" }}>Decline Request</Text>
           </View>
 
-          <View style={{height: 50}}>
+          <View style={{ height: 50 }}>
             <Text> </Text>
           </View>
 
@@ -154,7 +166,7 @@ const styles = StyleSheet.create({
     width: "45%",
     height: "45%",
     overflow: 'hidden',
-    fontSize: SCREEN_WIDTH*0.7/20
+    fontSize: SCREEN_WIDTH * 0.7 / 20
   }
 });
 
