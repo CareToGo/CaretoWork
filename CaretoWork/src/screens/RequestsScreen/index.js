@@ -13,13 +13,20 @@ import srvcReqs from "../../../assets/data/service_reqs.json";
 import SingleRequest from "../../components/SingleRequest";
 import MapView, { Marker } from "react-native-maps";
 import { MaterialIcons } from "@expo/vector-icons";
-import * as Location from "expo-location";
+import { DataStore } from "aws-amplify";
+import { Order } from "../../models";
 
 const RequestsScreen = () => {
+  const [orders, setOrders] = useState([]);
   const bottomSheetRef = useRef(null);
   const { height, width } = useWindowDimensions();
   const snapPoints = useMemo(() => [100, "85%"], []);
 
+  useEffect(() => {
+    DataStore.query(Order).then(setOrders);
+  }, []);
+
+  console.log(orders);
   return (
     <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
       <MapView

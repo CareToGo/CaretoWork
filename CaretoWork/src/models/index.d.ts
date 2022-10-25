@@ -61,12 +61,11 @@ export declare class Worker {
   readonly name: string;
   readonly image: string;
   readonly rating?: number | null;
-  readonly address: string;
   readonly lat: number;
   readonly lng: number;
   readonly Services?: (Service | null)[] | null;
   readonly Baskets?: (Basket | null)[] | null;
-  readonly transportationMode?: TransportationModes | keyof typeof TransportationModes | null;
+  readonly transportationMode: TransportationModes | keyof typeof TransportationModes;
   readonly sub: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -97,6 +96,9 @@ export declare class User {
   readonly firstname: string;
   readonly lastname: string;
   readonly ver: number;
+  readonly dob?: string | null;
+  readonly email?: string | null;
+  readonly contactnum?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   constructor(init: ModelInit<User, UserMetaData>);

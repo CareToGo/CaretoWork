@@ -1,18 +1,28 @@
-import { View, Text, TextInput, StyleSheet, Button, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Button,
+  Alert,
+  Pressable,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Auth, DataStore } from "aws-amplify";
-import { Worker } from "../../models";
+import { TransportationModes, Worker } from "../../models";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const EditUserProfile = () => {
   const { dbWorker, sub, setDbWorker } = useAuthContext();
   const [name, setName] = useState(dbWorker?.name || "");
   const [image, setImage] = useState(dbWorker?.image || "");
-  const [address, setAddress] = useState(dbWorker?.address || "");
-  const [lat, setLat] = useState(dbWorker?.lat + "" || "0");
-  const [lng, setLng] = useState(dbWorker?.lng + "" || "0");
+  const [transportationMode, setTransportationMode] = useState(
+    TransportationModes.BICYCLING
+  );
   const navigation = useNavigation();
 
   const onSave = async () => {
@@ -27,13 +37,8 @@ const EditUserProfile = () => {
   const updateWorker = async () => {
     const worker = await DataStore.save(
       Worker.copyOf(dbWorker, (updated) => {
-        updated.firstname = firstname;
-        updated.lastname = lastname;
-        updated.address = address;
-        updated.lat = parseFloat(lat);
-        updated.lng = parseFloat(lng);
-        updated._version = parseInt(dbUser.ver);
-        updated.ver = dbUser.ver + 1;
+        updated.name = name;
+        updated.transportationMode = transportationMode;
       })
     );
     console.log(worker);
@@ -45,12 +50,11 @@ const EditUserProfile = () => {
       const worker = await DataStore.save(
         new Worker({
           sub,
-          address,
-          lat: parseFloat(lat),
-          lng: parseFloat(lng),
-          firstname,
-          lastname,
-          ver: 1,
+          lat: 0,
+          lng: 0,
+          name,
+          image,
+          transportationMode,
         })
       );
       setDbWorker(worker);
@@ -75,24 +79,40 @@ const EditUserProfile = () => {
         placeholder="Image URL"
         style={styles.input}
       />
-      <TextInput
-        value={address}
-        onChangeText={setAddress}
-        placeholder="Address"
-        style={styles.input}
-      />
-      <TextInput
-        value={lat}
-        onChangeText={setLat}
-        placeholder="Latitude"
-        style={styles.input}
-      />
-      <TextInput
-        value={lng}
-        onChangeText={setLng}
-        placeholder="Longitude"
-        style={styles.input}
-      />
+      <View style={{ flexDirection: "row" }}>
+        <Pressable
+          onPress={() => setTransportationMode(TransportationModes.BICYCLING)}
+          style={{
+            backgroundColor:
+              transportationMode == TransportationModes.BICYCLING
+                ? "lightgreen"
+                : "white",
+            margin: 10,
+            padding: 10,
+            borderWidth: 1,
+            borderColor: "gray",
+            borderRadius: 10,
+          }}
+        >
+          <MaterialIcons name="pedal-bike" size={40} color="black" />
+        </Pressable>
+        <Pressable
+          onPress={() => setTransportationMode(TransportationModes.DRIVING)}
+          style={{
+            backgroundColor:
+              transportationMode == TransportationModes.DRIVING
+                ? "lightgreen"
+                : "white",
+            margin: 10,
+            padding: 10,
+            borderWidth: 1,
+            borderColor: "gray",
+            borderRadius: 10,
+          }}
+        >
+          <FontAwesome5 name="car" size={40} color="black" />
+        </Pressable>
+      </View>
       <Button
         onPress={onSave}
         title="Save"
