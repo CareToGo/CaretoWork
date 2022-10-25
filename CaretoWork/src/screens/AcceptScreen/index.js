@@ -1,12 +1,14 @@
-import { useRef, useMemo } from "react";
+import { useRef, memo, useMemo, useCallback, useState, useEffect } from "react";
 import {
-  Dimensions,
-  StyleSheet,
   Text,
   View,
-  Image,
+  Dimensions,
   useWindowDimensions,
+  PermissionsAndroid,
+  ActivityIndicator,
+  Image,
   Pressable,
+  StyleSheet,
 } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import {
@@ -16,22 +18,36 @@ import {
 import { FlatList } from "react-native-gesture-handler";
 import srvcReqs from "../../../assets/data/service_reqs.json";
 import SingleRequest from "../../components/SingleRequest";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
+import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import MapViewDirections from "react-native-maps-directions";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
+const order = srvcReqs[0];
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const RequestDetails = () => {
+const ORDER_STATUSES = {
+  READY_FOR_PICKUP: "READY_FOR_PICKUP",
+  ACCEPTED: "ACCEPTED",
+  PICKED_UP: "PICKED_UP",
+};
+
+const AcceptScreen = () => {
   const navigation = useNavigation();
+  const [homecareLocation, setHomecareLocation] = useState(null);
+  const [totalMinutes, setTotalMinutes] = useState(0);
+  const [totalKm, setTotalKm] = useState(0);
+  const bottomSheetRef = useRef(null);
+  const { height, width } = useWindowDimensions();
+  const snapPoints = useMemo(() => [100, "95%"], []);
   const route = useRoute();
   const srvc = route.params;
-  const { height, width } = useWindowDimensions();
-  const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ["100%"], []);
-
+  const mapRef = useRef();
+  const [orderStatus, setOrderStatus] = useState(
+    ORDER_STATUSES.READY_FOR_PICKUP
+  );
+  const [isClose, setIsClose] = useState(false);
   const namewidth = (SCREEN_WIDTH * 0.75) / srvc.Client.clientname.length;
   let namesize;
   if (namewidth <= 27) {
@@ -40,6 +56,39 @@ const RequestDetails = () => {
     namesize = 27;
   }
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (!status === "granted") {
+        console.log("Nonono");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync();
+      setHomecareLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+
+    const foregroundSubscription = Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        distanceInterval: 100,
+      },
+      (updatedLocation) => {
+        setHomecareLocation({
+          latitude: updatedLocation.coords.latitude,
+          longitude: updatedLocation.coords.longitude,
+        });
+      }
+    );
+    return foregroundSubscription;
+  }, []);
+
+  if (!homecareLocation) {
+    return <ActivityIndicator size={"large"} />;
+  }
   function getAge(dateString) {
     var today = new Date();
     var birthDate = new Date(dateString);
@@ -50,46 +99,131 @@ const RequestDetails = () => {
     }
     return age;
   }
-
-  const gobackHandler = () => {
-    navigation.navigate("RequestsScreen");
-  };
-
   const svcArray = srvc.Services.map((service) => (
     <Text key={service.id} style={styles.srvcbtnsmall}>
       {service.brief}
     </Text>
   ));
 
+  const onButtonPressed = () => {
+    if (orderStatus == ORDER_STATUSES.READY_FOR_PICKUP) {
+      bottomSheetRef.current.collapse();
+      mapRef.current.animateToRegion({
+        latitude: homecareLocation.latitude,
+        longitude: homecareLocation.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+      setOrderStatus(ORDER_STATUSES.ACCEPTED);
+    }
+    if (orderStatus === ORDER_STATUSES.ACCEPTED) {
+      setOrderStatus(ORDER_STATUSES.PICKED_UP);
+    }
+    if (orderStatus === ORDER_STATUSES.PICKED_UP) {
+      console.warn("finished");
+    }
+  };
+
+  const renderButtonTitle = () => {
+    if (orderStatus === ORDER_STATUSES.READY_FOR_PICKUP) {
+      return "Accept Order";
+    }
+    if (orderStatus === ORDER_STATUSES.ACCEPTED) {
+      return "Arrived";
+    }
+    if (orderStatus === ORDER_STATUSES.PICKED_UP) {
+      return "Complete";
+    }
+  };
+  const isButtonDisabled = () => {
+    if (orderStatus === ORDER_STATUSES.READY_FOR_PICKUP) {
+      return false;
+    }
+    if (orderStatus === ORDER_STATUSES.ACCEPTED && isClose) {
+      return false;
+    }
+    if (orderStatus === ORDER_STATUSES.PICKED_UP && isClose) {
+      return false;
+    }
+    return true;
+  };
+
   return (
-    <GestureHandlerRootView style={{ backgroundColor: "white", flex: 1 }}>
-      <View style={{ marginTop: "4%" }}>
-        <View style={styles.topbrief}>
-          <Pressable onPress={gobackHandler} style={{ width: "15%" }}>
-            <FontAwesome5
-              name="arrow-left"
-              size={30}
-              color="#001A72"
-              style={{ marginHorizontal: 10 }}
-            />
-          </Pressable>
-          <View
-            style={{
-              width: "85%",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+    <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
+      <MapView
+        ref={mapRef}
+        showsUserLocation={true}
+        followsUserLocation={true}
+        showsMyLocationButton={true}
+        initialRegion={{
+          latitude: homecareLocation.latitude,
+          longitude: homecareLocation.longitude,
+          latitudeDelta: 0.07,
+          longitudeDelta: 0.07,
+        }}
+        style={{ height, width }}
+      >
+        <MapViewDirections
+          origin={homecareLocation}
+          destination={{
+            latitude: srvc.Client.lat,
+            longitude: srvc.Client.lng,
+          }}
+          strokeWidth={10}
+          waypoints={[
+            { latitude: srvc.Client.lat, longitude: srvc.Client.lng },
+          ]}
+          apikey={"AIzaSyAwqJ3mR3salkuJ6noO2q9RvslWxIX5t3Y"}
+          onReady={(result) => {
+            if (result.distance < 0.01) {
+              setIsClose(true);
+            }
+            setTotalMinutes(result.duration);
+            setTotalKm(result.distance);
+          }}
+        />
+        {srvcReqs.map((req) => (
+          <Marker
+            key={req.reqid}
+            title={req.Client.name}
+            description={req.Client.address}
+            coordinate={{ latitude: req.Client.lat, longitude: req.Client.lng }}
           >
-            <Text style={{ fontSize: 27, letterSpacing: 1 }}>14 min</Text>
-            <FontAwesome5
-              name="hand-holding-medical"
-              size={30}
-              color="#001A72"
-              style={{ marginHorizontal: 10 }}
-            />
-            <Text style={{ fontSize: 27, letterSpacing: 1 }}>5 km</Text>
-          </View>
+            <View
+              style={{
+                backgroundColor: "#001A72",
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <MaterialIcons name="medical-services" size={30} color="white" />
+            </View>
+          </Marker>
+        ))}
+      </MapView>
+
+      <BottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
+        <View
+          style={{
+            alignItems: "center",
+            marginBottom: 20,
+            paddingTop: 10,
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ fontSize: 25, letterSpacing: 1 }}>
+            {totalMinutes.toFixed(1)} min
+          </Text>
+          <FontAwesome5
+            name="hand-holding-medical"
+            size={30}
+            color="#001A72"
+            style={{ marginHorizontal: 10 }}
+          />
+          <Text style={{ fontSize: 25, letterSpacing: 1 }}>
+            {totalKm.toFixed(2)} km
+          </Text>
         </View>
         <ScrollView
           style={{ paddingHorizontal: "3%", backgroundColor: "white" }}
@@ -214,17 +348,18 @@ const RequestDetails = () => {
           <Pressable
             style={{
               marginTop: 20,
-              backgroundColor: "#3FC060",
+              backgroundColor: isButtonDisabled() ? "grey" : "#3FC060",
               width: "100%",
               height: 60,
               borderRadius: 15,
               textAlign: "center",
               justifyContent: "center",
             }}
-            onPress={() => navigation.navigate("AcceptScreen", { id: srvc.id })}
+            onPress={onButtonPressed}
+            disabled={isButtonDisabled()}
           >
             <Text style={{ textAlign: "center", fontSize: 21, color: "white" }}>
-              Accept Request
+              {renderButtonTitle()}
             </Text>
           </Pressable>
 
@@ -238,6 +373,7 @@ const RequestDetails = () => {
               textAlign: "center",
               justifyContent: "center",
             }}
+            onPress={navigation.goBack}
           >
             <Text style={{ textAlign: "center", fontSize: 21, color: "white" }}>
               Decline Request
@@ -248,7 +384,7 @@ const RequestDetails = () => {
             <Text> </Text>
           </View>
         </ScrollView>
-      </View>
+      </BottomSheet>
     </GestureHandlerRootView>
   );
 };
@@ -300,4 +436,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RequestDetails;
+export default AcceptScreen;

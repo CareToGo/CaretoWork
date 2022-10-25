@@ -1,0 +1,62 @@
+enum TransportationModes {
+  DRIVING
+  BICYCLING
+}
+
+type Basket @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  userID: ID! @index(name: "byUser")
+  workerID: ID! @index(name: "byWorker")
+}
+
+enum OrderStatus {
+  NEW
+  HEADING
+  READY
+  COMPLETED
+}
+
+type Order @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  userID: ID! @index(name: "byUser")
+  Worker: Worker @hasOne
+  status: OrderStatus!
+  total: Float!
+  service: String!
+}
+
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  sub: String!
+  address: String!
+  lat: Float!
+  lng: Float!
+  Orders: [Order] @hasMany(indexName: "byUser", fields: ["id"])
+  Baskets: [Basket] @hasMany(indexName: "byUser", fields: ["id"])
+  firstname: String!
+  lastname: String!
+  ver: Int!
+}
+
+type Service @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  description: String
+  price: Float!
+  workerID: ID! @index(name: "byWorker")
+}
+
+type Worker @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  image: String!
+  rating: Float
+  address: String!
+  lat: Float!
+  lng: Float!
+  Services: [Service] @hasMany(indexName: "byWorker", fields: ["id"])
+  Baskets: [Basket] @hasMany(indexName: "byWorker", fields: ["id"])
+  transportationMode: TransportationModes
+  sub: String!
+}
+ 

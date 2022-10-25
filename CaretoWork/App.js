@@ -1,26 +1,31 @@
 import { useRef } from "react";
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, FlatList } from 'react-native';
-import { Entypo } from "@expo/vector-icons"
-import orders from './assets/data/orders.json'
-import srvcReqs from './assets/data/service_reqs.json'
-import SingleRequest from './src/components/SingleRequest';
-import RequestsScreen from "./src/screens/RequestsScreen";
-import RequestDetails from "./src/screens/RequestDetails";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View, Image, FlatList } from "react-native";
 import Navigation from "./src/navigation";
 import { NavigationContainer } from "@react-navigation/native";
+import { Amplify } from "aws-amplify";
+import awsconfig from "./src/aws-exports";
+import { withAuthenticator } from "aws-amplify-react-native";
+import AuthContextProvider from "./src/contexts/AuthContext";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-const request = srvcReqs[0];
+Amplify.configure({
+  ...awsconfig,
+  Analytics: {
+    disabled: true,
+  },
+});
 
-export default function App() {
+function App() {
   return (
     <NavigationContainer>
-      <View style={styles.container}>
-        <Navigation />
-        {/* <RequestDetails /> */}
-        {/* <RequestsScreen /> */}
+      <GestureHandlerRootView style={styles.container}>
+        <AuthContextProvider>
+          <Navigation />
+        </AuthContextProvider>
+
         <StatusBar style="auto" />
-      </View>
+      </GestureHandlerRootView>
     </NavigationContainer>
   );
 }
@@ -29,17 +34,19 @@ const styles = StyleSheet.create({
   container: {
     // borderWidth: 2,
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     // alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 0
+    justifyContent: "center",
+    paddingTop: 0,
   },
   srvcbtn: {
     color: "#FFDE59",
-    backgroundColor: '#001A72',
+    backgroundColor: "#001A72",
     borderRadius: 5,
     padding: 6,
-    textAlign: 'center',
-    marginTop: 5
-  }
+    textAlign: "center",
+    marginTop: 5,
+  },
 });
+
+export default withAuthenticator(App);
