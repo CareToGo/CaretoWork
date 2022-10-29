@@ -7,30 +7,34 @@ import {
   Image,
   Pressable,
 } from "react-native";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
-import orders from "../../../assets/data/orders.json";
-import srvcReqs from "../../../assets/data/service_reqs.json";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const SingleRequest = ({ request }) => {
-  const svcArray = request.Services.map((service) => (
+const SingleRequest = ({ order }) => {
+  const [services, setServices] = useState([]);
+  useEffect(() => {
+    setServices(JSON.parse(order.service));
+  }, []);
+
+  const svcArray = services.map((service) => (
     <Text key={service.id} style={styles.srvcbtn}>
-      {service.brief}
+      {service.name}
     </Text>
   ));
   const navigation = useNavigation();
-
   const pressHandler = () => {
-    navigation.navigate("AcceptScreen", request);
-    // console.log(request);
+    navigation.navigate("AcceptScreen", order);
   };
 
   return (
     <Pressable style={styles.singlereq} onPress={pressHandler}>
       <Image
-        source={{ uri: request.Client.image }}
+        source={{
+          uri: "https://i.ibb.co/wzDZmHt/65214598-10158632753688102-8820209946474840064-n.jpg",
+        }}
         style={{
           width: "35%",
           height: "100%",
@@ -39,10 +43,8 @@ const SingleRequest = ({ request }) => {
         }}
       />
       <View style={{ marginLeft: 10, marginRight: 10, flex: 1, width: "50%" }}>
-        <Text style={{ fontSize: 24, fontWeight: "600" }}>
-          {request.Client.name}
-        </Text>
-        <Text style={{ color: "grey" }}>{request.Client.address}</Text>
+        <Text style={{ fontSize: 24, fontWeight: "600" }}>{order.name}</Text>
+        <Text style={{ color: "grey" }}>{order.address}</Text>
         <Text style={{ marginTop: 10, fontSize: (SCREEN_WIDTH * 0.75) / 19 }}>
           Services Requested:
         </Text>

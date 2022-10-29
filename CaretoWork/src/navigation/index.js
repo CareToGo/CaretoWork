@@ -1,6 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import RequestsScreen from "../screens/RequestsScreen";
-import RequestDetails from "../screens/RequestDetails";
 import AcceptScreen from "../screens/AcceptScreen";
 import EditUserProfile from "../screens/EditUserProfile/EditUserProfile";
 import { useAuthContext } from "../contexts/AuthContext";

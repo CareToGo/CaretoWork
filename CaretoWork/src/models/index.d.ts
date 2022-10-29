@@ -18,10 +18,6 @@ type ServiceMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
 }
 
-type BasketMetaData = {
-  readOnlyFields: 'createdAt' | 'updatedAt';
-}
-
 type OrderMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
 }
@@ -60,28 +56,6 @@ export declare const Service: (new (init: ModelInit<Service, ServiceMetaData>) =
   copyOf(source: Service, mutator: (draft: MutableModel<Service, ServiceMetaData>) => MutableModel<Service, ServiceMetaData> | void): Service;
 }
 
-type EagerBasket = {
-  readonly id: string;
-  readonly userID: string;
-  readonly workerID: string;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-type LazyBasket = {
-  readonly id: string;
-  readonly userID: string;
-  readonly workerID: string;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-export declare type Basket = LazyLoading extends LazyLoadingDisabled ? EagerBasket : LazyBasket
-
-export declare const Basket: (new (init: ModelInit<Basket, BasketMetaData>) => Basket) & {
-  copyOf(source: Basket, mutator: (draft: MutableModel<Basket, BasketMetaData>) => MutableModel<Basket, BasketMetaData> | void): Basket;
-}
-
 type EagerOrder = {
   readonly id: string;
   readonly userID: string;
@@ -89,6 +63,10 @@ type EagerOrder = {
   readonly status: OrderStatus | keyof typeof OrderStatus;
   readonly total: number;
   readonly service: string;
+  readonly lat: number;
+  readonly lng: number;
+  readonly name: string;
+  readonly address: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly orderWorkerId?: string | null;
@@ -101,6 +79,10 @@ type LazyOrder = {
   readonly status: OrderStatus | keyof typeof OrderStatus;
   readonly total: number;
   readonly service: string;
+  readonly lat: number;
+  readonly lng: number;
+  readonly name: string;
+  readonly address: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly orderWorkerId?: string | null;
@@ -119,7 +101,6 @@ type EagerWorker = {
   readonly rating?: number | null;
   readonly lat: number;
   readonly lng: number;
-  readonly Baskets?: (Basket | null)[] | null;
   readonly transportationMode: TransportationModes | keyof typeof TransportationModes;
   readonly sub: string;
   readonly service: string;
@@ -134,7 +115,6 @@ type LazyWorker = {
   readonly rating?: number | null;
   readonly lat: number;
   readonly lng: number;
-  readonly Baskets: AsyncCollection<Basket>;
   readonly transportationMode: TransportationModes | keyof typeof TransportationModes;
   readonly sub: string;
   readonly service: string;
@@ -155,7 +135,6 @@ type EagerUser = {
   readonly lat: number;
   readonly lng: number;
   readonly Orders?: (Order | null)[] | null;
-  readonly Baskets?: (Basket | null)[] | null;
   readonly firstname: string;
   readonly lastname: string;
   readonly ver: number;
@@ -173,7 +152,6 @@ type LazyUser = {
   readonly lat: number;
   readonly lng: number;
   readonly Orders: AsyncCollection<Order>;
-  readonly Baskets: AsyncCollection<Basket>;
   readonly firstname: string;
   readonly lastname: string;
   readonly ver: number;

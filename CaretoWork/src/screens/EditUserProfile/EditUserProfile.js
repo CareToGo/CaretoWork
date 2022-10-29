@@ -20,7 +20,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Service } from "../../models";
 import tw from "tailwind-react-native-classnames";
-import { set } from "react-native-reanimated";
 
 const EditUserProfile = () => {
   const { dbWorker, sub, setDbWorker } = useAuthContext();
@@ -33,10 +32,21 @@ const EditUserProfile = () => {
   const [services, setServices] = useState([]);
 
   const navigation = useNavigation();
+
   const [selected, setSelected] = useState({});
 
+  const fetchService = async () => {
+    const results = await DataStore.query(Service);
+    setServices(results);
+    let initialSelected = {};
+    for (let item of results) {
+      initialSelected[item.id] = false;
+      setSelected(initialSelected);
+    }
+  };
+
   useEffect(() => {
-    DataStore.query(Service).then(setServices);
+    fetchService();
   }, []);
 
   const onSave = async () => {
@@ -61,7 +71,7 @@ const EditUserProfile = () => {
 
   const createWorker = async () => {
     Object.keys(selected).forEach(function (key) {
-      if (selected[key] === false) {
+      if (selected[key] == false) {
         delete selected[key];
       }
     });
@@ -92,95 +102,103 @@ const EditUserProfile = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView style={{ flex: 1 }}>
-        <Text style={styles.title}>Edit My Profile</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="Name"
-          style={styles.input}
-        />
-        <TextInput
-          value={image}
-          onChangeText={setImage}
-          placeholder="Image URL"
-          style={styles.input}
-        />
-        <View style={{ flexDirection: "row" }}>
-          <Pressable
-            onPress={() => setTransportationMode(TransportationModes.BICYCLING)}
-            style={{
-              backgroundColor:
-                transportationMode == TransportationModes.BICYCLING
-                  ? "lightgreen"
-                  : "white",
-              margin: 10,
-              padding: 10,
-              borderWidth: 1,
-              borderColor: "gray",
-              borderRadius: 10,
-            }}
-          >
-            <MaterialIcons name="pedal-bike" size={40} color="black" />
-          </Pressable>
-          <Pressable
-            onPress={() => setTransportationMode(TransportationModes.DRIVING)}
-            style={{
-              backgroundColor:
-                transportationMode == TransportationModes.DRIVING
-                  ? "lightgreen"
-                  : "white",
-              margin: 10,
-              padding: 10,
-              borderWidth: 1,
-              borderColor: "gray",
-              borderRadius: 10,
-            }}
-          >
-            <FontAwesome5 name="car" size={40} color="black" />
-          </Pressable>
-        </View>
-
-        <FlatList
-          data={services}
-          keyExtractor={(item) => item.id}
-          ItemSeparatorComponent={() => (
-            <View style={tw` border-t border-gray-200 flex-shrink py-0`} />
-          )}
-          renderItem={({ item: { id, name, description, price }, item }) => (
-            <TouchableOpacity
-              onPress={() => {
-                let newSelected = { ...selected };
-                newSelected[item.id] = !newSelected[item.id];
-                setSelected(newSelected);
-              }}
-              style={tw`flex-row items-center justify-between p-5 ${
-                selected[id] && "bg-gray-200"
-              }`}
+      <FlatList
+        data={services}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <View>
+            <Text style={styles.title}>Edit My Profile</Text>
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              placeholder="Name"
+              style={styles.input}
+            />
+            <TextInput
+              value={image}
+              onChangeText={setImage}
+              placeholder="Image URL"
+              style={styles.input}
+            />
+            <View style={{ flexDirection: "row" }}>
+              <Pressable
+                onPress={() =>
+                  setTransportationMode(TransportationModes.BICYCLING)
+                }
+                style={{
+                  backgroundColor:
+                    transportationMode == TransportationModes.BICYCLING
+                      ? "lightgreen"
+                      : "white",
+                  margin: 10,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderColor: "gray",
+                  borderRadius: 10,
+                }}
+              >
+                <MaterialIcons name="pedal-bike" size={40} color="black" />
+              </Pressable>
+              <Pressable
+                onPress={() =>
+                  setTransportationMode(TransportationModes.DRIVING)
+                }
+                style={{
+                  backgroundColor:
+                    transportationMode == TransportationModes.DRIVING
+                      ? "lightgreen"
+                      : "white",
+                  margin: 10,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderColor: "gray",
+                  borderRadius: 10,
+                }}
+              >
+                <FontAwesome5 name="car" size={40} color="black" />
+              </Pressable>
+            </View>
+          </View>
+        }
+        ListFooterComponent={() => (
+          <ScrollView>
+            <Button
+              onPress={onSave}
+              title="Save"
+              style={{ margin: 10, backgroundColor: "blue" }}
+            />
+            <Text
+              onPress={() => Auth.signOut()}
+              style={{ textAlign: "center", color: "red", margin: 10 }}
             >
-              <View style={tw`w-4/5`}>
-                <Text style={tw`font-semibold text-lg`}>{name}</Text>
-                <Text style={tw`text-gray-500`}>{description}</Text>
-              </View>
-              <View style={tw``}>
-                <Text style={tw`text-lg`}>${price}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-
-        <Button
-          onPress={onSave}
-          title="Save"
-          style={{ margin: 10, backgroundColor: "blue" }}
-        />
-        <Text
-          onPress={() => Auth.signOut()}
-          style={{ textAlign: "center", color: "red", margin: 10 }}
-        >
-          Sign Out
-        </Text>
-      </ScrollView>
+              Sign Out
+            </Text>
+          </ScrollView>
+        )}
+        ItemSeparatorComponent={() => (
+          <View style={tw` border-t border-gray-200 flex-shrink py-0`} />
+        )}
+        renderItem={({ item: { id, name, description, price }, item }) => (
+          <TouchableOpacity
+            onPress={() => {
+              let newSelected = { ...selected };
+              newSelected[item.id] = !newSelected[item.id];
+              setSelected(newSelected);
+            }}
+            style={tw`flex-row items-center justify-between p-5 ${
+              selected[id] && "bg-gray-200"
+            }`}
+          >
+            <View style={tw`w-4/5`}>
+              <Text style={tw`font-semibold text-lg`}>{name}</Text>
+              <Text style={tw`text-gray-500`}>{description}</Text>
+            </View>
+            <View style={tw``}>
+              <Text style={tw`text-lg`}>${price}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
     </SafeAreaView>
   );
 };

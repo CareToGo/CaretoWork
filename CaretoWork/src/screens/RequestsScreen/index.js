@@ -22,11 +22,16 @@ const RequestsScreen = () => {
   const { height, width } = useWindowDimensions();
   const snapPoints = useMemo(() => [100, "85%"], []);
 
+  const fetchOrder = async () => {
+    const results = await DataStore.query(Order);
+    setOrders(results);
+    console.log(orders);
+  };
+
   useEffect(() => {
-    DataStore.query(Order).then(setOrders);
+    fetchOrder();
   }, []);
 
-  console.log(orders);
   return (
     <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
       <MapView
@@ -35,12 +40,12 @@ const RequestsScreen = () => {
         showsMyLocationButton={true}
         style={{ height, width }}
       >
-        {srvcReqs.map((req) => (
+        {orders.map((order) => (
           <Marker
-            key={req.reqid}
-            title={req.Client.name}
-            description={req.Client.address}
-            coordinate={{ latitude: req.Client.lat, longitude: req.Client.lng }}
+            key={order.id}
+            title={order.name}
+            description={order.address}
+            coordinate={{ latitude: order.lat, longitude: order.lng }}
           >
             <View
               style={{
@@ -69,11 +74,11 @@ const RequestsScreen = () => {
           >
             You're Online
           </Text>
-          <Text>Available Requests: {srvcReqs.length}</Text>
+          <Text>Available Requests: {orders.length}</Text>
         </View>
         <FlatList
-          data={srvcReqs}
-          renderItem={({ item }) => <SingleRequest request={item} />}
+          data={orders}
+          renderItem={({ item }) => <SingleRequest order={item} />}
         />
       </BottomSheet>
     </GestureHandlerRootView>
