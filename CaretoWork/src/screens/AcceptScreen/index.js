@@ -15,16 +15,14 @@ import {
   GestureHandlerRootView,
   ScrollView,
 } from "react-native-gesture-handler";
-import { FlatList } from "react-native-gesture-handler";
-import srvcReqs from "../../../assets/data/service_reqs.json";
-import SingleRequest from "../../components/SingleRequest";
 import MapView, { Marker } from "react-native-maps";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import MapViewDirections from "react-native-maps-directions";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { DataStore } from "aws-amplify";
+import { Order } from "../../models";
 
-const order = srvcReqs[0];
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const ORDER_STATUSES = {
@@ -34,6 +32,12 @@ const ORDER_STATUSES = {
 };
 
 const AcceptScreen = () => {
+  const [orders, setOrders] = useState([]);
+  const fetchOrder = async () => {
+    const results = await DataStore.query(Order);
+    setOrders(results);
+  };
+
   const navigation = useNavigation();
   const [homecareLocation, setHomecareLocation] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
@@ -48,7 +52,8 @@ const AcceptScreen = () => {
     ORDER_STATUSES.READY_FOR_PICKUP
   );
   const [isClose, setIsClose] = useState(false);
-  const namewidth = (SCREEN_WIDTH * 0.75) / srvc.Client.clientname.length;
+
+  const namewidth = (SCREEN_WIDTH * 0.75) / srvc.name.length;
   let namesize;
   if (namewidth <= 27) {
     namesize = namewidth;
@@ -57,6 +62,7 @@ const AcceptScreen = () => {
   }
 
   useEffect(() => {
+    fetchOrder();
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (!status === "granted") {
@@ -99,9 +105,9 @@ const AcceptScreen = () => {
     }
     return age;
   }
-  const svcArray = srvc.Services.map((service) => (
+  const svcArray = JSON.parse(srvc.service).map((service) => (
     <Text key={service.id} style={styles.srvcbtnsmall}>
-      {service.brief}
+      {service.name}
     </Text>
   ));
 
@@ -166,13 +172,11 @@ const AcceptScreen = () => {
         <MapViewDirections
           origin={homecareLocation}
           destination={{
-            latitude: srvc.Client.lat,
-            longitude: srvc.Client.lng,
+            latitude: srvc.lat,
+            longitude: srvc.lng,
           }}
           strokeWidth={10}
-          waypoints={[
-            { latitude: srvc.Client.lat, longitude: srvc.Client.lng },
-          ]}
+          waypoints={[{ latitude: srvc.lat, longitude: srvc.lng }]}
           apikey={"AIzaSyAwqJ3mR3salkuJ6noO2q9RvslWxIX5t3Y"}
           onReady={(result) => {
             if (result.distance < 0.01) {
@@ -182,12 +186,13 @@ const AcceptScreen = () => {
             setTotalKm(result.distance);
           }}
         />
-        {srvcReqs.map((req) => (
+
+        {orders.map((order) => (
           <Marker
-            key={req.reqid}
-            title={req.Client.name}
-            description={req.Client.address}
-            coordinate={{ latitude: req.Client.lat, longitude: req.Client.lng }}
+            key={order.id}
+            title={order.name}
+            description={order.address}
+            coordinate={{ latitude: order.lat, longitude: order.lng }}
           >
             <View
               style={{
@@ -231,7 +236,9 @@ const AcceptScreen = () => {
           <View style={styles.client}>
             <View style={styles.clientphoto}>
               <Image
-                source={{ uri: srvc.Client.image }}
+                source={{
+                  uri: "https://i.ibb.co/wzDZmHt/65214598-10158632753688102-8820209946474840064-n.jpg",
+                }}
                 style={{
                   width: SCREEN_WIDTH * 0.33,
                   height: SCREEN_WIDTH * 0.33,
@@ -244,7 +251,7 @@ const AcceptScreen = () => {
                 numberOfLines={1}
                 style={{ fontWeight: "500", fontSize: namesize, width: "100%" }}
               >
-                {srvc.Client.clientname}
+                {srvc.name}
               </Text>
               <View
                 style={{
@@ -257,15 +264,15 @@ const AcceptScreen = () => {
               >
                 <Text style={{ fontSize: 18 }}>
                   {" "}
-                  {srvc.Client.rating.toFixed(2)}
+                  {/* {srvc.rating.toFixed(2)} */}
                 </Text>
                 <Text style={{ marginLeft: -3, marginTop: 1 }}>
                   {" "}
                   <MaterialIcons name="star" size={21} color="#FFDE59" />{" "}
                 </Text>
               </View>
-              <Text style={{ color: "grey" }}>{srvc.Client.address}</Text>
-              <Text style={{ color: "grey" }}>{srvc.Client.contact}</Text>
+              <Text style={{ color: "grey" }}>{srvc.address}</Text>
+              {/* <Text style={{ color: "grey" }}>{srvc.contact}</Text> */}
             </View>
           </View>
 
@@ -288,19 +295,19 @@ const AcceptScreen = () => {
             </View>
             <View style={{ width: "100%", marginTop: 2 }}>
               <Text style={{ fontSize: 15, color: "grey" }}>
-                Allergies: {srvc.Client.allergies}
+                {/* Allergies: {srvc.allergies} */}
               </Text>
               <Text style={{ fontSize: 15, color: "grey" }}>
                 Diagnosis: None
               </Text>
               <Text style={{ fontSize: 15, color: "grey" }}>
-                {srvc.Client.gender} : {getAge(srvc.Client.DOB)} YO
+                {/* {srvc.gender} : {getAge(srvc.DOB)} YO */}
               </Text>
               <Text style={{ fontSize: 15, color: "grey" }}>
-                Languages: {srvc.Client.language}
+                {/* Languages: {srvc.language} */}
               </Text>
               <Text style={{ fontSize: 15, color: "grey" }}>
-                Scheduled Time: {srvc.RequestDetails.time}
+                {/* Scheduled Time: {srvc.RequestDetails.time} */}
               </Text>
             </View>
             <View style={{ width: "100%", marginTop: 20 }}>
@@ -340,7 +347,7 @@ const AcceptScreen = () => {
               }}
             >
               <Text style={{ fontSize: 15, color: "grey" }}>
-                {srvc.RequestDetails.description}
+                {/* {srvc.description} */}
               </Text>
             </View>
           </View>
