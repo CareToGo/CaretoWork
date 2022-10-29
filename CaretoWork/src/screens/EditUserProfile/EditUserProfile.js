@@ -65,7 +65,6 @@ const EditUserProfile = () => {
         updated.transportationMode = transportationMode;
       })
     );
-    console.log(worker);
     setDbWorker(worker);
   };
 
@@ -94,7 +93,6 @@ const EditUserProfile = () => {
         })
       );
       setDbWorker(worker);
-      console.log(worker);
     } catch (e) {
       Alert.alert("Error", e.message);
     }

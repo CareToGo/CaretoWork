@@ -8,18 +8,12 @@ import {
   useWindowDimensions,
   Pressable,
 } from "react-native";
-import BottomSheet from "@gorhom/bottom-sheet";
 import {
   GestureHandlerRootView,
   ScrollView,
 } from "react-native-gesture-handler";
-import { FlatList } from "react-native-gesture-handler";
-import srvcReqs from "../../../assets/data/service_reqs.json";
-import SingleRequest from "../../components/SingleRequest";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Entypo } from "@expo/vector-icons";
-import MapView from "react-native-maps";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");

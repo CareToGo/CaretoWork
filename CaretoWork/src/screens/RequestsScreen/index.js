@@ -9,7 +9,6 @@ import {
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlatList } from "react-native-gesture-handler";
-import srvcReqs from "../../../assets/data/service_reqs.json";
 import SingleRequest from "../../components/SingleRequest";
 import MapView, { Marker } from "react-native-maps";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -25,7 +24,6 @@ const RequestsScreen = () => {
   const fetchOrder = async () => {
     const results = await DataStore.query(Order);
     setOrders(results);
-    console.log(orders);
   };
 
   useEffect(() => {

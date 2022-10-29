@@ -21,7 +21,7 @@ import * as Location from "expo-location";
 import MapViewDirections from "react-native-maps-directions";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { DataStore } from "aws-amplify";
-import { Order } from "../../models";
+import { Order, User } from "../../models";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -33,9 +33,14 @@ const ORDER_STATUSES = {
 
 const AcceptScreen = () => {
   const [orders, setOrders] = useState([]);
+  const [user, setUser] = useState([]);
+
   const fetchOrder = async () => {
     const results = await DataStore.query(Order);
     setOrders(results);
+    const info = await DataStore.query(User, results[0].userID);
+    setUser(info);
+    console.log(info);
   };
 
   const navigation = useNavigation();
@@ -46,14 +51,14 @@ const AcceptScreen = () => {
   const { height, width } = useWindowDimensions();
   const snapPoints = useMemo(() => [100, "95%"], []);
   const route = useRoute();
-  const srvc = route.params;
+  const order = route.params;
   const mapRef = useRef();
   const [orderStatus, setOrderStatus] = useState(
     ORDER_STATUSES.READY_FOR_PICKUP
   );
   const [isClose, setIsClose] = useState(false);
 
-  const namewidth = (SCREEN_WIDTH * 0.75) / srvc.name.length;
+  const namewidth = (SCREEN_WIDTH * 0.75) / order.name.length;
   let namesize;
   if (namewidth <= 27) {
     namesize = namewidth;
@@ -95,6 +100,13 @@ const AcceptScreen = () => {
   if (!homecareLocation) {
     return <ActivityIndicator size={"large"} />;
   }
+  const orderLocation = {
+    latitude: order?.lat,
+    longitude: order?.lng,
+  };
+  if (!orderLocation) {
+    return <ActivityIndicator size={"large"} />;
+  }
   function getAge(dateString) {
     var today = new Date();
     var birthDate = new Date(dateString);
@@ -105,7 +117,7 @@ const AcceptScreen = () => {
     }
     return age;
   }
-  const svcArray = JSON.parse(srvc.service).map((service) => (
+  const svcArray = JSON.parse(order.service).map((service) => (
     <Text key={service.id} style={styles.srvcbtnsmall}>
       {service.name}
     </Text>
@@ -172,11 +184,11 @@ const AcceptScreen = () => {
         <MapViewDirections
           origin={homecareLocation}
           destination={{
-            latitude: srvc.lat,
-            longitude: srvc.lng,
+            latitude: order.lat,
+            longitude: order.lng,
           }}
           strokeWidth={10}
-          waypoints={[{ latitude: srvc.lat, longitude: srvc.lng }]}
+          waypoints={[{ latitude: order.lat, longitude: order.lng }]}
           apikey={"AIzaSyAwqJ3mR3salkuJ6noO2q9RvslWxIX5t3Y"}
           onReady={(result) => {
             if (result.distance < 0.01) {
@@ -251,7 +263,7 @@ const AcceptScreen = () => {
                 numberOfLines={1}
                 style={{ fontWeight: "500", fontSize: namesize, width: "100%" }}
               >
-                {srvc.name}
+                {order.name}
               </Text>
               <View
                 style={{
@@ -271,7 +283,7 @@ const AcceptScreen = () => {
                   <MaterialIcons name="star" size={21} color="#FFDE59" />{" "}
                 </Text>
               </View>
-              <Text style={{ color: "grey" }}>{srvc.address}</Text>
+              <Text style={{ color: "grey" }}>{order.address}</Text>
               {/* <Text style={{ color: "grey" }}>{srvc.contact}</Text> */}
             </View>
           </View>
