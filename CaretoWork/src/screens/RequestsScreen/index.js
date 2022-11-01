@@ -9,27 +9,33 @@ import {
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlatList } from "react-native-gesture-handler";
+
 import SingleRequest from "../../components/SingleRequest";
 import MapView, { Marker } from "react-native-maps";
 import { MaterialIcons } from "@expo/vector-icons";
 import { DataStore } from "aws-amplify";
 import { Order } from "../../models";
+import { useAuthContext } from "../../contexts/AuthContext";
+import { useOrderContext } from "../../contexts/OrderContext";
 
 const RequestsScreen = () => {
   const [orders, setOrders] = useState([]);
   const bottomSheetRef = useRef(null);
   const { height, width } = useWindowDimensions();
   const snapPoints = useMemo(() => [100, "85%"], []);
+  const { dbWorker } = useAuthContext();
 
-  const fetchOrder = async () => {
-    const results = await DataStore.query(Order);
-    setOrders(results);
+  const fetchOrders = async () => {
+    const filter = await DataStore.query(Order, (order) =>
+      order.orderWorkerId("eq", dbWorker.id)
+    );
+
+    setOrders(filter);
   };
 
   useEffect(() => {
-    fetchOrder();
+    fetchOrders();
   }, []);
-
   return (
     <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
       <MapView

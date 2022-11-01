@@ -22,6 +22,9 @@ import MapViewDirections from "react-native-maps-directions";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { DataStore } from "aws-amplify";
 import { Order, User } from "../../models";
+import OrderContextProvider, {
+  useOrderContext,
+} from "../../contexts/OrderContext";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -33,16 +36,8 @@ const ORDER_STATUSES = {
 
 const AcceptScreen = () => {
   const [orders, setOrders] = useState([]);
-  const [user, setUser] = useState([]);
-
-  const fetchOrder = async () => {
-    const results = await DataStore.query(Order);
-    setOrders(results);
-    const info = await DataStore.query(User, results[0].userID);
-    setUser(info);
-    console.log(info);
-  };
-
+  const { order, user, acceptOrder, fetchOrder, arrivedOrder, completeOrder } =
+    useOrderContext();
   const navigation = useNavigation();
   const [homecareLocation, setHomecareLocation] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
@@ -51,14 +46,26 @@ const AcceptScreen = () => {
   const { height, width } = useWindowDimensions();
   const snapPoints = useMemo(() => [100, "95%"], []);
   const route = useRoute();
-  const order = route.params;
-  const mapRef = useRef();
-  const [orderStatus, setOrderStatus] = useState(
-    ORDER_STATUSES.READY_FOR_PICKUP
-  );
-  const [isClose, setIsClose] = useState(false);
+  const id = route.params?.id;
+  const data = route.params;
 
-  const namewidth = (SCREEN_WIDTH * 0.75) / order.name.length;
+  const fetchOrders = async () => {
+    const results = await DataStore.query(Order);
+    setOrders(results);
+  };
+
+  useEffect(() => {
+    fetchOrder(id);
+
+    const subscription = DataStore.observe(Order).subscribe((msg) => {
+      if (msg.opType === "UPDATED") {
+        fetchOrders();
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [id]);
+
+  const namewidth = (SCREEN_WIDTH * 0.75) / data.name.length;
   let namesize;
   if (namewidth <= 27) {
     namesize = namewidth;
@@ -66,8 +73,14 @@ const AcceptScreen = () => {
     namesize = 27;
   }
 
+  const mapRef = useRef();
+  const [orderStatus, setOrderStatus] = useState(
+    ORDER_STATUSES.READY_FOR_PICKUP
+  );
+  const [isClose, setIsClose] = useState(false);
+
   useEffect(() => {
-    fetchOrder();
+    fetchOrders();
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (!status === "granted") {
@@ -104,9 +117,10 @@ const AcceptScreen = () => {
     latitude: order?.lat,
     longitude: order?.lng,
   };
-  if (!orderLocation) {
+  if (!order || !orderLocation) {
     return <ActivityIndicator size={"large"} />;
   }
+
   function getAge(dateString) {
     var today = new Date();
     var birthDate = new Date(dateString);
@@ -123,8 +137,9 @@ const AcceptScreen = () => {
     </Text>
   ));
 
-  const onButtonPressed = () => {
-    if (orderStatus == ORDER_STATUSES.READY_FOR_PICKUP) {
+  const onButtonPressed = async () => {
+    console.log(order.status);
+    if (order.status == "NEW") {
       bottomSheetRef.current.collapse();
       mapRef.current.animateToRegion({
         latitude: homecareLocation.latitude,
@@ -132,35 +147,45 @@ const AcceptScreen = () => {
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
-      setOrderStatus(ORDER_STATUSES.ACCEPTED);
-    }
-    if (orderStatus === ORDER_STATUSES.ACCEPTED) {
-      setOrderStatus(ORDER_STATUSES.PICKED_UP);
-    }
-    if (orderStatus === ORDER_STATUSES.PICKED_UP) {
-      console.warn("finished");
+      await acceptOrder();
+    } else if (order.status === "ACCEPTED") {
+      bottomSheetRef.current?.collapse();
+      await arrivedOrder();
+    } else if (order.status === "ARRIVED") {
+      bottomSheetRef.current?.collapse();
+      await completeOrder();
+    } else if (order.status === "COMPLETED") {
+      bottomSheetRef.current?.collapse();
+      navigation.goBack();
     }
   };
 
   const renderButtonTitle = () => {
-    if (orderStatus === ORDER_STATUSES.READY_FOR_PICKUP) {
+    if (order.status === "NEW") {
       return "Accept Order";
     }
-    if (orderStatus === ORDER_STATUSES.ACCEPTED) {
+    if (order.status === "ACCEPTED") {
       return "Arrived";
     }
-    if (orderStatus === ORDER_STATUSES.PICKED_UP) {
+
+    if (order.status === "ARRIVED") {
+      return "Arrived";
+    }
+    if (order.status === "COMPLETED") {
       return "Complete";
     }
   };
   const isButtonDisabled = () => {
-    if (orderStatus === ORDER_STATUSES.READY_FOR_PICKUP) {
+    if (order.status === "NEW") {
       return false;
     }
-    if (orderStatus === ORDER_STATUSES.ACCEPTED && isClose) {
+    if (order.status === "ACCEPTED" && isClose) {
       return false;
     }
-    if (orderStatus === ORDER_STATUSES.PICKED_UP && isClose) {
+    if (order.status === "ARRIVED") {
+      return false;
+    }
+    if (order.status === "Complete") {
       return false;
     }
     return true;
@@ -191,7 +216,7 @@ const AcceptScreen = () => {
           waypoints={[{ latitude: order.lat, longitude: order.lng }]}
           apikey={"AIzaSyAwqJ3mR3salkuJ6noO2q9RvslWxIX5t3Y"}
           onReady={(result) => {
-            if (result.distance < 0.01) {
+            if (result.distance < 0.0001) {
               setIsClose(true);
             }
             setTotalMinutes(result.duration);
@@ -201,10 +226,10 @@ const AcceptScreen = () => {
 
         {orders.map((order) => (
           <Marker
-            key={order.id}
-            title={order.name}
-            description={order.address}
-            coordinate={{ latitude: order.lat, longitude: order.lng }}
+            key={order?.id}
+            title={order?.name}
+            description={order?.address}
+            coordinate={{ latitude: order?.lat, longitude: order?.lng }}
           >
             <View
               style={{
@@ -261,9 +286,13 @@ const AcceptScreen = () => {
             <View style={styles.clientinfo}>
               <Text
                 numberOfLines={1}
-                style={{ fontWeight: "500", fontSize: namesize, width: "100%" }}
+                style={{
+                  fontWeight: "500",
+                  fontSize: namewidth,
+                  width: "100%",
+                }}
               >
-                {order.name}
+                {user?.firstname} {user?.lastname}
               </Text>
               <View
                 style={{
@@ -283,8 +312,8 @@ const AcceptScreen = () => {
                   <MaterialIcons name="star" size={21} color="#FFDE59" />{" "}
                 </Text>
               </View>
-              <Text style={{ color: "grey" }}>{order.address}</Text>
-              {/* <Text style={{ color: "grey" }}>{srvc.contact}</Text> */}
+              <Text style={{ color: "grey" }}>{order?.address}</Text>
+              <Text style={{ color: "grey" }}>{user?.contactnum}</Text>
             </View>
           </View>
 

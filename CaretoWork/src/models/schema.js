@@ -479,9 +479,9 @@ export const schema = {
             "name": "OrderStatus",
             "values": [
                 "NEW",
-                "HEADING",
-                "READY",
-                "COMPLETED"
+                "ARRIVED",
+                "COMPLETED",
+                "ACCEPTED"
             ]
         }
     },

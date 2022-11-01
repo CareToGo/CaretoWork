@@ -13,9 +13,9 @@ enum TransportationModes {
 
 enum OrderStatus {
   NEW
-  HEADING
-  READY
+  ARRIVED
   COMPLETED
+  ACCEPTED
 }
 
 type Order @model @auth(rules: [{allow: public}]) {

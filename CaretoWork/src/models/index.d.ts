@@ -9,9 +9,9 @@ export enum TransportationModes {
 
 export enum OrderStatus {
   NEW = "NEW",
-  HEADING = "HEADING",
-  READY = "READY",
-  COMPLETED = "COMPLETED"
+  ARRIVED = "ARRIVED",
+  COMPLETED = "COMPLETED",
+  ACCEPTED = "ACCEPTED"
 }
 
 type ServiceMetaData = {
