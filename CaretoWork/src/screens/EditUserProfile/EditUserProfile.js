@@ -8,6 +8,7 @@ import {
   Pressable,
   FlatList,
   ScrollView,
+  Image,
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -19,12 +20,14 @@ import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Service } from "../../models";
+import { Storage } from "aws-amplify";
+import Constants from "expo-constants";
+import * as ImagePicker from "expo-image-picker";
 import tw from "tailwind-react-native-classnames";
 
 const EditUserProfile = () => {
   const { dbWorker, sub, setDbWorker } = useAuthContext();
   const [name, setName] = useState(dbWorker?.name || "");
-  const [image, setImage] = useState(dbWorker?.image || "");
   const [info, setInfo] = useState();
   const [transportationMode, setTransportationMode] = useState(
     TransportationModes.BICYCLING
@@ -34,7 +37,8 @@ const EditUserProfile = () => {
   const navigation = useNavigation();
 
   const [selected, setSelected] = useState({});
-
+  const [imageData, setImageData] = useState(null);
+  const [percentage, setPercentage] = useState(0);
   const fetchService = async () => {
     const results = await DataStore.query(Service);
     setServices(results);
@@ -48,6 +52,86 @@ const EditUserProfile = () => {
   useEffect(() => {
     fetchService();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (Constants.platform.ios) {
+        const cameraRollStatus =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
+        if (
+          cameraRollStatus.status !== "granted" ||
+          cameraStatus.status !== "granted"
+        ) {
+          alert("Sorry, we need these permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: "Images",
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    handleImagePicked(result);
+  };
+
+  const handleImagePicked = async (pickerResult) => {
+    try {
+      if (pickerResult.cancelled) {
+        alert("Upload cancelled");
+        return;
+      } else {
+        setPercentage(0);
+        const img = await fetchImageFromUri(pickerResult.uri);
+        const uploadUrl = await uploadImage({ sub } + ".jpg", img);
+        const result = await Storage.get(uploadUrl);
+        setImageData(result);
+        setImageData((state) => {
+          console.log(state);
+          return state;
+        });
+      }
+    } catch (e) {
+      console.log(e);
+      alert("Upload failed");
+    }
+  };
+
+  const uploadImage = (filename, img) => {
+    Auth.currentCredentials();
+    return Storage.put(filename, img, {
+      level: "public",
+      contentType: "image/jpeg",
+      progressCallback(progress) {
+        setLoading(progress);
+      },
+    })
+      .then((response) => {
+        return response.key;
+      })
+      .catch((error) => {
+        console.log(error);
+        return error.response;
+      });
+  };
+
+  const setLoading = (progress) => {
+    const calculated = parseInt((progress.loaded / progress.total) * 100);
+    updatePercentage(calculated);
+  };
+
+  const updatePercentage = (number) => {
+    setPercentage(number);
+  };
+
+  const fetchImageFromUri = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    return blob;
+  };
 
   const onSave = async () => {
     if (dbWorker) {
@@ -63,6 +147,7 @@ const EditUserProfile = () => {
       Worker.copyOf(dbWorker, (updated) => {
         updated.name = name;
         updated.transportationMode = transportationMode;
+        updated.image = imageData;
       })
     );
     setDbWorker(worker);
@@ -87,7 +172,7 @@ const EditUserProfile = () => {
           lat: 0,
           lng: 0,
           name,
-          image,
+          image: imageData,
           transportationMode,
           service: JSON.stringify(info),
         })
@@ -100,24 +185,63 @@ const EditUserProfile = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <View
+        style={{
+          width: "100%",
+          borderWidth: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {imageData || dbWorker?.image ? (
+          <Image
+            source={{
+              uri: imageData ? imageData : dbWorker?.image,
+            }}
+            style={{
+              width: "30%",
+              height: undefined,
+              aspectRatio: 1,
+              borderRadius: 100,
+            }}
+          />
+        ) : (
+          <Image
+            source={{
+              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqXhATMW-sSeAdbYfIGpe9hNhBCo_S_T1EblnSnfKYMw&s",
+            }}
+            style={{
+              width: "30%",
+              height: undefined,
+              aspectRatio: 1,
+              borderRadius: 100,
+            }}
+          />
+        )}
+      </View>
       <FlatList
         data={services}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View>
             <Text style={styles.title}>Edit My Profile</Text>
+            <View style={styles.container}>
+              {percentage !== 0 && (
+                <Text style={styles.percentage}>{percentage}%</Text>
+              )}
+
+              <Button
+                onPress={pickImage}
+                title="Pick an image from camera roll"
+              />
+            </View>
             <TextInput
               value={name}
               onChangeText={setName}
               placeholder="Name"
               style={styles.input}
             />
-            <TextInput
-              value={image}
-              onChangeText={setImage}
-              placeholder="Image URL"
-              style={styles.input}
-            />
+
             <View style={{ flexDirection: "row" }}>
               <Pressable
                 onPress={() =>

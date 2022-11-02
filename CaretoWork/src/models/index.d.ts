@@ -141,6 +141,7 @@ type EagerUser = {
   readonly dob?: string | null;
   readonly email?: string | null;
   readonly contactnum?: string | null;
+  readonly image: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -158,6 +159,7 @@ type LazyUser = {
   readonly dob?: string | null;
   readonly email?: string | null;
   readonly contactnum?: string | null;
+  readonly image: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
