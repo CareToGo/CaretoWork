@@ -5,7 +5,6 @@ import Navigation from "./src/navigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { Amplify } from "aws-amplify";
 import awsconfig from "./src/aws-exports";
-import { withAuthenticator } from "aws-amplify-react-native";
 import AuthContextProvider from "./src/contexts/AuthContext";
 import OrderContextProvider from "./src/contexts/OrderContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -34,10 +33,8 @@ function App() {
 
 const styles = StyleSheet.create({
   container: {
-    // borderWidth: 2,
     flex: 1,
     backgroundColor: "#fff",
-    // alignItems: 'center',
     justifyContent: "center",
     paddingTop: 0,
   },
@@ -51,4 +48,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withAuthenticator(App);
+export default App;

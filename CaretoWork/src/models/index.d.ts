@@ -58,15 +58,15 @@ export declare const Service: (new (init: ModelInit<Service, ServiceMetaData>) =
 
 type EagerOrder = {
   readonly id: string;
-  readonly userID: string;
   readonly Worker?: Worker | null;
-  readonly status: OrderStatus | keyof typeof OrderStatus;
+  readonly userID: string;
   readonly total: number;
   readonly service: string;
   readonly lat: number;
   readonly lng: number;
   readonly name: string;
   readonly address: string;
+  readonly status: OrderStatus | keyof typeof OrderStatus;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly orderWorkerId?: string | null;
@@ -74,15 +74,15 @@ type EagerOrder = {
 
 type LazyOrder = {
   readonly id: string;
-  readonly userID: string;
   readonly Worker: AsyncItem<Worker | undefined>;
-  readonly status: OrderStatus | keyof typeof OrderStatus;
+  readonly userID: string;
   readonly total: number;
   readonly service: string;
   readonly lat: number;
   readonly lng: number;
   readonly name: string;
   readonly address: string;
+  readonly status: OrderStatus | keyof typeof OrderStatus;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly orderWorkerId?: string | null;
@@ -134,7 +134,6 @@ type EagerUser = {
   readonly address: string;
   readonly lat: number;
   readonly lng: number;
-  readonly Orders?: (Order | null)[] | null;
   readonly firstname: string;
   readonly lastname: string;
   readonly ver: number;
@@ -142,6 +141,7 @@ type EagerUser = {
   readonly email?: string | null;
   readonly contactnum?: string | null;
   readonly image: string;
+  readonly Orders?: (Order | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -152,7 +152,6 @@ type LazyUser = {
   readonly address: string;
   readonly lat: number;
   readonly lng: number;
-  readonly Orders: AsyncCollection<Order>;
   readonly firstname: string;
   readonly lastname: string;
   readonly ver: number;
@@ -160,6 +159,7 @@ type LazyUser = {
   readonly email?: string | null;
   readonly contactnum?: string | null;
   readonly image: string;
+  readonly Orders: AsyncCollection<Order>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

@@ -86,7 +86,7 @@ const EditUserProfile = () => {
       } else {
         setPercentage(0);
         const img = await fetchImageFromUri(pickerResult.uri);
-        const uploadUrl = await uploadImage({ sub } + ".jpg", img);
+        const uploadUrl = await uploadImage(`${sub}.jpg`, img);
         const result = await Storage.get(uploadUrl);
         setImageData(result);
         setImageData((state) => {
