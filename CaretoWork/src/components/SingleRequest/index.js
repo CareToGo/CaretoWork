@@ -10,11 +10,47 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
+import * as Location from "expo-location";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const SingleRequest = ({ order }) => {
   const [services, setServices] = useState([]);
+  const [homecareLocation, setHomecareLocation] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (!status === "granted") {
+        console.log("Nonono");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync();
+      setHomecareLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+
+    const foregroundSubscription = Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        distanceInterval: 100,
+      },
+      (updatedLocation) => {
+        setHomecareLocation({
+          latitude: updatedLocation.coords.latitude,
+          longitude: updatedLocation.coords.longitude,
+        });
+      }
+    );
+    return foregroundSubscription;
+  }, []);
+
+  if (!homecareLocation) {
+    return <ActivityIndicator size={"large"} />;
+  }
   useEffect(() => {
     setServices(JSON.parse(order.service));
   }, []);

@@ -36,7 +36,8 @@ const SignInScreen = () => {
     }
     setLoading(true);
     try {
-      await Auth.signIn(data.email, data.password);
+      const auth = await Auth.signIn(data.email, data.password);
+
       navigation.navigate("EditUserProfile");
     } catch (e) {
       Alert.alert("Oops", e.message);

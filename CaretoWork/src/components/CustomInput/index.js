@@ -57,5 +57,11 @@ const styles = StyleSheet.create({
     height: 55,
     marginVertical: 5,
   },
-  input: { fontWeight: "", fontSize: 15, paddingVertical: 20 },
+  input: {
+    fontWeight: "",
+    fontSize: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+  },
 });

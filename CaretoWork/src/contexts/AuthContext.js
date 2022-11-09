@@ -9,16 +9,33 @@ const AuthContextProvider = ({ children }) => {
   const [dbWorker, setDbWorker] = useState(null);
   const sub = authUser?.attributes?.sub;
 
-  useEffect(() => {
-    Auth.currentAuthenticatedUser({ bypassCache: true }).then(setAuthUser);
-    console.log(authUser);
-  }, []);
+  const fetchsub = async () => {
+    Auth.currentAuthenticatedUser()
+      .then((results) => {
+        setAuthUser(results);
+        queryWorker(results.attributes.sub);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
+  const queryWorker = async (arg) => {
+    const subscription = DataStore.observeQuery(Worker, (worker) =>
+      worker.sub("eq", arg)
+    ).subscribe((snapshot) => {
+      const { items } = snapshot;
+      setDbWorker(items[0]);
+    });
+  };
   useEffect(() => {
-    DataStore.query(Worker, (worker) => worker.sub("eq", sub)).then((workers) =>
-      setDbWorker(workers[0])
-    );
-  }, [sub]);
+    fetchsub();
+  }, []);
+  // useEffect(() => {
+  //   DataStore.query(Worker, (worker) => worker.sub("eq", sub)).then((workers) =>
+  //     setDbWorker(workers[0])
+  //   );
+  // }, [sub]);
 
   return (
     <AuthContext.Provider value={{ authUser, dbWorker, sub, setDbWorker }}>

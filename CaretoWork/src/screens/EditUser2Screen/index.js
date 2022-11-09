@@ -25,7 +25,7 @@ import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import SelectDropdown from "react-native-select-dropdown";
 
-const EditUserProfile = () => {
+const EditUser2Screen = () => {
   const { dbWorker, sub, setDbWorker } = useAuthContext();
   const Language = [
     "English",
@@ -43,42 +43,17 @@ const EditUserProfile = () => {
 
   const [firstName, setFirstName] = useState(dbWorker?.firstName || "");
   const [lastName, setLastName] = useState("");
-  const [info, setInfo] = useState("");
-  const [rating, setRating] = useState("");
   const [gender, setGender] = useState("");
   const [profession, setProfession] = useState("");
   const [languages, setLanguages] = useState("");
   const [experienceDescription, setExperienceDescription] = useState("");
   const [bio, setBio] = useState("");
-  const [address, setAddress] = useState("");
   const [transportationMode, setTransportationMode] = useState(
     TransportationModes.BICYCLING
   );
-  const [services, setServices] = useState([]);
-
   const navigation = useNavigation();
-
-  const [selected, setSelected] = useState({});
   const [imageData, setImageData] = useState(null);
   const [percentage, setPercentage] = useState(0);
-
-  const queryPSWService = async () => {
-    const subscription = DataStore.observeQuery(PSWService).subscribe(
-      (snapshot) => {
-        const { items } = snapshot;
-        setServices(items);
-        let initialSelected = {};
-        for (let item of items) {
-          initialSelected[item.id] = false;
-          setSelected(initialSelected);
-        }
-      }
-    );
-  };
-
-  useEffect(() => {
-    queryPSWService();
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -182,6 +157,7 @@ const EditUserProfile = () => {
         updated.firstName = firstName;
         updated.lastName = lastName;
         updated.transportationMode = transportationMode;
+        updated.image = imageData;
       })
     );
     setDbWorker(worker);
@@ -295,7 +271,7 @@ const EditUserProfile = () => {
             data={Profession}
             defaultButtonText="Select a Profession"
             onSelect={(selectedItem, index) => {
-              setGender(selectedItem);
+              setProfession(selectedItem);
             }}
             buttonTextAfterSelection={(selectedItem, index) => {
               // text represented after item is selected
@@ -393,7 +369,7 @@ const EditUserProfile = () => {
   );
 };
 
-export default EditUserProfile;
+export default EditUser2Screen;
 
 const styles = StyleSheet.create({
   title: {

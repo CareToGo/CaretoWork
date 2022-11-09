@@ -2,6 +2,12 @@ import { ModelInit, MutableModel } from "@aws-amplify/datastore";
 // @ts-ignore
 import { LazyLoading, LazyLoadingDisabled, AsyncItem, AsyncCollection } from "@aws-amplify/datastore";
 
+export enum Caretype {
+  TOTALCARE = "TOTALCARE",
+  SOMEASSISTANCE = "SOMEASSISTANCE",
+  INDEPENDENT = "INDEPENDENT"
+}
+
 export enum TransportationModes {
   DRIVING = "DRIVING",
   BICYCLING = "BICYCLING"
@@ -14,7 +20,11 @@ export enum OrderStatus {
   ACCEPTED = "ACCEPTED"
 }
 
-type ServiceMetaData = {
+type PSWServiceMetaData = {
+  readOnlyFields: 'createdAt' | 'updatedAt';
+}
+
+type NurseServiceMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
 }
 
@@ -30,30 +40,52 @@ type UserMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
 }
 
-type EagerService = {
+type EagerPSWService = {
   readonly id: string;
   readonly name: string;
   readonly description: string;
-  readonly price: number;
-  readonly workable: boolean;
+  readonly price: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
 
-type LazyService = {
+type LazyPSWService = {
   readonly id: string;
   readonly name: string;
   readonly description: string;
-  readonly price: number;
-  readonly workable: boolean;
+  readonly price: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
 
-export declare type Service = LazyLoading extends LazyLoadingDisabled ? EagerService : LazyService
+export declare type PSWService = LazyLoading extends LazyLoadingDisabled ? EagerPSWService : LazyPSWService
 
-export declare const Service: (new (init: ModelInit<Service, ServiceMetaData>) => Service) & {
-  copyOf(source: Service, mutator: (draft: MutableModel<Service, ServiceMetaData>) => MutableModel<Service, ServiceMetaData> | void): Service;
+export declare const PSWService: (new (init: ModelInit<PSWService, PSWServiceMetaData>) => PSWService) & {
+  copyOf(source: PSWService, mutator: (draft: MutableModel<PSWService, PSWServiceMetaData>) => MutableModel<PSWService, PSWServiceMetaData> | void): PSWService;
+}
+
+type EagerNurseService = {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly price: number;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyNurseService = {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly price: number;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type NurseService = LazyLoading extends LazyLoadingDisabled ? EagerNurseService : LazyNurseService
+
+export declare const NurseService: (new (init: ModelInit<NurseService, NurseServiceMetaData>) => NurseService) & {
+  copyOf(source: NurseService, mutator: (draft: MutableModel<NurseService, NurseServiceMetaData>) => MutableModel<NurseService, NurseServiceMetaData> | void): NurseService;
 }
 
 type EagerOrder = {
@@ -96,28 +128,40 @@ export declare const Order: (new (init: ModelInit<Order, OrderMetaData>) => Orde
 
 type EagerWorker = {
   readonly id: string;
-  readonly name: string;
-  readonly image: string;
+  readonly firstName: string;
+  readonly lastName: string;
   readonly rating?: number | null;
   readonly lat: number;
   readonly lng: number;
   readonly transportationMode: TransportationModes | keyof typeof TransportationModes;
+  readonly services?: string | null;
+  readonly gender: string;
+  readonly profession: string;
+  readonly languages: string;
+  readonly experienceDescription: string;
+  readonly bio: string;
   readonly sub: string;
-  readonly service: string;
+  readonly isVerified: boolean;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
 
 type LazyWorker = {
   readonly id: string;
-  readonly name: string;
-  readonly image: string;
+  readonly firstName: string;
+  readonly lastName: string;
   readonly rating?: number | null;
   readonly lat: number;
   readonly lng: number;
   readonly transportationMode: TransportationModes | keyof typeof TransportationModes;
+  readonly services?: string | null;
+  readonly gender: string;
+  readonly profession: string;
+  readonly languages: string;
+  readonly experienceDescription: string;
+  readonly bio: string;
   readonly sub: string;
-  readonly service: string;
+  readonly isVerified: boolean;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -137,11 +181,21 @@ type EagerUser = {
   readonly firstname: string;
   readonly lastname: string;
   readonly ver: number;
-  readonly dob?: string | null;
-  readonly email?: string | null;
-  readonly contactnum?: string | null;
-  readonly image: string;
+  readonly dob: string;
+  readonly email: string;
+  readonly contactnum: string;
   readonly Orders?: (Order | null)[] | null;
+  readonly postalcode: string;
+  readonly bio?: string | null;
+  readonly gender: string;
+  readonly emergency: string;
+  readonly mobility: Caretype | keyof typeof Caretype;
+  readonly feeding: Caretype | keyof typeof Caretype;
+  readonly toileting: Caretype | keyof typeof Caretype;
+  readonly bathing: Caretype | keyof typeof Caretype;
+  readonly mealprep: Caretype | keyof typeof Caretype;
+  readonly allergies: string;
+  readonly diagnosis: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -155,11 +209,21 @@ type LazyUser = {
   readonly firstname: string;
   readonly lastname: string;
   readonly ver: number;
-  readonly dob?: string | null;
-  readonly email?: string | null;
-  readonly contactnum?: string | null;
-  readonly image: string;
+  readonly dob: string;
+  readonly email: string;
+  readonly contactnum: string;
   readonly Orders: AsyncCollection<Order>;
+  readonly postalcode: string;
+  readonly bio?: string | null;
+  readonly gender: string;
+  readonly emergency: string;
+  readonly mobility: Caretype | keyof typeof Caretype;
+  readonly feeding: Caretype | keyof typeof Caretype;
+  readonly toileting: Caretype | keyof typeof Caretype;
+  readonly bathing: Caretype | keyof typeof Caretype;
+  readonly mealprep: Caretype | keyof typeof Caretype;
+  readonly allergies: string;
+  readonly diagnosis: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

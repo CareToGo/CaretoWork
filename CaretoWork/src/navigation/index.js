@@ -8,7 +8,9 @@ import SignUpScreen from "../screens/SignUpScreen";
 import ConfirmEmailScreen from "../screens/ConfirmEmailScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import NewPasswordScreen from "../screens/NewPasswordScreen";
+import EditUser2Screen from "../screens/EditUser2Screen";
 import { View, ActivityIndicator } from "react-native";
+import EditServicesScreen from "../screens/EditServicesScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +29,13 @@ const Navigation = () => {
         <>
           <Stack.Screen name="RequestsScreen" component={RequestsScreen} />
           <Stack.Screen name="AcceptScreen" component={AcceptScreen} />
+          <Stack.Group screenOptions={{ presentation: "modal" }}>
+            <Stack.Screen name="EditUser2Screen" component={EditUser2Screen} />
+            <Stack.Screen
+              name="EditServicesScreen"
+              component={EditServicesScreen}
+            />
+          </Stack.Group>
         </>
       ) : (
         <>

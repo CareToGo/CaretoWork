@@ -3982,6 +3982,11 @@
     find-up "^5.0.0"
     js-yaml "^4.1.0"
 
+"@freakycoder/react-native-bounceable@>= ^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@freakycoder/react-native-bounceable/-/react-native-bounceable-1.0.3.tgz#79de6fa99fb8357a5e52cc095ecdb1786f4b1514"
+  integrity sha512-+iMq2tnqxCwFjitbPUz9nZ+VfJ8OU9waIlDJAAsoq1229QEwCmERCNy5zVtDsz75q3i4FLXX/n7fimdMzmP21A==
+
 "@gar/promisify@^1.0.1":
   version "1.1.3"
   resolved "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.3.tgz"
@@ -4316,6 +4321,11 @@
   version "9.3.6"
   resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-9.3.6.tgz#730de4ebf83f7263fa61b0cbec6cde9b28660077"
   integrity sha512-SwbBnHZuXcCUpYdL6ebt4HPAZEugPASl+RPxIyNe91Y+boZptzAFLywYW6yU93DYAhiHHFQBL6x6LxwF/K/tOQ==
+
+"@react-native-picker/picker@^1.8.3":
+  version "1.16.8"
+  resolved "https://registry.yarnpkg.com/@react-native-picker/picker/-/picker-1.16.8.tgz#2126ca54d4a5a3e9ea5e3f39ad1e6643f8e4b3d4"
+  integrity sha512-pacdQDX6V6EmjF+HoiIh6u++qx4mTK0WnhgUHRc01B+Qt5eoeUwseBqmqfTSXTx/aHDEd6PiIw7UGvKgFoqgFQ==
 
 "@react-native-picker/picker@^2.4.8":
   version "2.4.8"
@@ -6009,6 +6019,11 @@ expo-font@~10.2.0:
   integrity sha512-2V4EcpmhNoppaLn+lPprZVS+3bmV9hxLPKttKh2u8ghjH/oX9bv3u4JVo77SYh0EfrWO4toqVyXn8pXH8GpbIg==
   dependencies:
     fontfaceobserver "^2.1.0"
+
+expo-haptics@~11.3.0:
+  version "11.3.0"
+  resolved "https://registry.yarnpkg.com/expo-haptics/-/expo-haptics-11.3.0.tgz#74283bd212a86f16ff2d6b0125e2a9604c940523"
+  integrity sha512-mQYSZsJ7LcdM2b8JecrV2qEw9ymNzGleS/+bpufdHZ+n5tCnWZXiMvZFFczaExHfaeGY3nGQvH1RjEOFIXSfig==
 
 expo-image-loader@~3.2.0:
   version "3.2.0"
@@ -8816,7 +8831,7 @@ prompts@^2.3.2, prompts@^2.4.0:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@*, prop-types@^15.6.0, prop-types@^15.7.2:
+prop-types@*, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.7.2:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -8951,6 +8966,13 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-languages-select@^1.0.20:
+  version "1.0.20"
+  resolved "https://registry.yarnpkg.com/react-languages-select/-/react-languages-select-1.0.20.tgz#a3697afab5fab140049f0c58caf966e306ef527b"
+  integrity sha512-JsnfSL1jCfGnC9VV5TvZ+R4rLCrA93u/0aybodHMbOQjPuRrUQhMOhFB/SiF+7LEZl+IIhF3sU0dEu4/9giFgA==
+  dependencies:
+    prop-types "^15.5.8"
+
 react-native-codegen@^0.69.1:
   version "0.69.1"
   resolved "https://registry.npmjs.org/react-native-codegen/-/react-native-codegen-0.69.1.tgz"
@@ -8984,6 +9006,13 @@ react-native-gradle-plugin@^0.0.7:
   resolved "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.0.7.tgz"
   integrity sha512-+4JpbIx42zGTONhBTIXSyfyHICHC29VTvhkkoUOJAh/XHPEixpuBduYgf6Y4y9wsN1ARlQhBBoptTvXvAFQf5g==
 
+react-native-language-select@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-language-select/-/react-native-language-select-1.1.0.tgz#297c53b95c20f94f4144a7a5283dca5eb3546eeb"
+  integrity sha512-9AH565fE6TSNu1sw2cA6TnWLvKJmlU+kQDZxvT+/hJi5i646wPVqHRaO9Vg3MgdY2nVN2lUasrVv+GKvqBMmFQ==
+  dependencies:
+    "@freakycoder/react-native-bounceable" ">= ^1.0.3"
+
 react-native-maps-directions@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/react-native-maps-directions/-/react-native-maps-directions-1.9.0.tgz#63ae8e8b36499042a658e43cd4836ac89aab8b7d"
@@ -8999,6 +9028,14 @@ react-native-maps@0.31.1:
   dependencies:
     "@types/geojson" "^7946.0.7"
     deprecated-react-native-prop-types "^2.3.0"
+
+react-native-picker-select@^8.0.4:
+  version "8.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-picker-select/-/react-native-picker-select-8.0.4.tgz#3f7f1f42df69b06e7d2c10338288332a6c40fd10"
+  integrity sha512-orBjPIwBkV5oipyVw263YNMI56f6Kj3p/ejabZoCYYNSG3AiLVVhC2RqsxMgDA7IayyURAW+AlV+mDJyVqLBkg==
+  dependencies:
+    "@react-native-picker/picker" "^1.8.3"
+    lodash.isequal "^4.5.0"
 
 react-native-reanimated@~2.9.1:
   version "2.9.1"
@@ -9035,6 +9072,18 @@ react-native-screens@~3.15.0:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-select-dropdown@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-select-dropdown/-/react-native-select-dropdown-3.0.1.tgz#5dbbebc885993b20d1f3e6ac5e915c72c761b241"
+  integrity sha512-JWkgGznlhfmA12MX+4WKe9kKQ2ejAiaes3hHdgeLExNkgP9/qybOtf7RAwnyY5Wkn5xkyOe82si/CSngNUUCFA==
+
+react-native-switch@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/react-native-switch/-/react-native-switch-1.5.1.tgz#da032f66547053aa004c7a159422dbca8fadd944"
+  integrity sha512-nfuPrrPKzeZL1mQH0u1rlEGv9W1+okU/xOcNNaDNz/LhSdzWOZ04ogJ4iEj7Sth3hkBxv4XwFQZTgCc07we+cg==
+  dependencies:
+    prop-types "^15.6.0"
 
 react-native@0.69.4:
   version "0.69.4"

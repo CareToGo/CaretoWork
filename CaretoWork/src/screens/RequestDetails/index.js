@@ -7,6 +7,7 @@ import {
   Image,
   useWindowDimensions,
   Pressable,
+  Button,
 } from "react-native";
 import {
   GestureHandlerRootView,
@@ -15,6 +16,8 @@ import {
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { TouchableOpacity } from "@gorhom/bottom-sheet";
+import { Auth } from "aws-amplify";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -237,7 +240,7 @@ const RequestDetails = () => {
               Decline Request
             </Text>
           </Pressable>
-
+          <Button onPress={Auth.signOut()}>Signout</Button>
           <View style={{ height: 50 }}>
             <Text> </Text>
           </View>
