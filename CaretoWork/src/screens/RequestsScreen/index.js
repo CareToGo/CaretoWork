@@ -22,6 +22,7 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import tw from "tailwind-react-native-classnames";
 import { useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Slider from "@react-native-community/slider";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,27 +32,9 @@ const RequestsScreen = () => {
   const { height, width } = useWindowDimensions();
   const snapPoints = useMemo(() => [140, "85%"], []);
   const { dbWorker } = useAuthContext();
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  const startAnimation = (toValue) => {
-    Animated.timing(animatedValue, {
-      toValue,
-      duration: 400,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
-  };
+  const [open, setOpen] = useState(false);
+  const toggleSwitch = () => setOpen((previousState) => !previousState);
 
-  const left = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["2%", "50%"],
-    extrapolate: "clamp",
-  });
-
-  const scale = animatedValue.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [1, 0.9, 1],
-    extrapolate: "clamp",
-  });
   const navigation = useNavigation();
   const fetchOrders = async () => {
     const filter = await DataStore.query(Order, (order) =>
@@ -60,18 +43,43 @@ const RequestsScreen = () => {
 
     setOrders(filter);
   };
+  const [range, setRange] = useState(0);
 
   useEffect(() => {
     fetchOrders();
   }, []);
   return (
     <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
-      <TouchableOpacity
-        style={tw`bg-gray-100 absolute top-16 left-8 z-50 p-3 rounded-full shadow-lg`}
-        onPress={startAnimation.bind(null, 1)}
-      >
-        <Ionicons name="options" size={24} color="#001A72" />
-      </TouchableOpacity>
+      <View style={tw`flex-row absolute top-16 left-8 z-50 p-3`}>
+        <TouchableOpacity
+          style={tw`bg-gray-100 p-3 rounded-full shadow-lg`}
+          activeOpacity={0.9}
+          onPress={() => setOpen((state) => !state)}
+        >
+          <Ionicons name="options" size={24} color="#001A72" />
+        </TouchableOpacity>
+        {open ? (
+          <View style={tw`flex-row items-center`}>
+            <Slider
+              style={{ width: 200, height: 20 }}
+              onValueChange={(value) => setRange(value)}
+              minimumValue={1}
+              maximumValue={30}
+              value={range}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "bold",
+              }}
+            >
+              {Math.floor(range)}Km
+            </Text>
+          </View>
+        ) : (
+          <View></View>
+        )}
+      </View>
 
       <MapView
         showsUserLocation={true}
