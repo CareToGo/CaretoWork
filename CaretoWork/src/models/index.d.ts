@@ -2,22 +2,23 @@ import { ModelInit, MutableModel } from "@aws-amplify/datastore";
 // @ts-ignore
 import { LazyLoading, LazyLoadingDisabled, AsyncItem, AsyncCollection } from "@aws-amplify/datastore";
 
-export enum Caretype {
-  TOTALCARE = "TOTALCARE",
-  SOMEASSISTANCE = "SOMEASSISTANCE",
-  INDEPENDENT = "INDEPENDENT"
-}
-
-export enum TransportationModes {
-  DRIVING = "DRIVING",
-  BICYCLING = "BICYCLING"
-}
-
 export enum OrderStatus {
   NEW = "NEW",
   ARRIVED = "ARRIVED",
   COMPLETED = "COMPLETED",
   ACCEPTED = "ACCEPTED"
+}
+
+export enum TransportationModes {
+  BICYCLE = "BICYCLE",
+  CAR = "CAR",
+  WALK = "WALK"
+}
+
+export enum CareType {
+  TOTALCARE = "TOTALCARE",
+  SOMEASSITANCE = "SOMEASSITANCE",
+  INDEPENDENT = "INDEPENDENT"
 }
 
 type PSWServiceMetaData = {
@@ -44,7 +45,7 @@ type EagerPSWService = {
   readonly id: string;
   readonly name: string;
   readonly description: string;
-  readonly price: string;
+  readonly price: number;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -53,7 +54,7 @@ type LazyPSWService = {
   readonly id: string;
   readonly name: string;
   readonly description: string;
-  readonly price: string;
+  readonly price: number;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -90,15 +91,15 @@ export declare const NurseService: (new (init: ModelInit<NurseService, NurseServ
 
 type EagerOrder = {
   readonly id: string;
-  readonly Worker?: Worker | null;
-  readonly userID: string;
   readonly total: number;
   readonly service: string;
   readonly lat: number;
   readonly lng: number;
   readonly name: string;
   readonly address: string;
-  readonly status: OrderStatus | keyof typeof OrderStatus;
+  readonly status?: OrderStatus | keyof typeof OrderStatus | null;
+  readonly Worker?: Worker | null;
+  readonly userID: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly orderWorkerId?: string | null;
@@ -106,15 +107,15 @@ type EagerOrder = {
 
 type LazyOrder = {
   readonly id: string;
-  readonly Worker: AsyncItem<Worker | undefined>;
-  readonly userID: string;
   readonly total: number;
   readonly service: string;
   readonly lat: number;
   readonly lng: number;
   readonly name: string;
   readonly address: string;
-  readonly status: OrderStatus | keyof typeof OrderStatus;
+  readonly status?: OrderStatus | keyof typeof OrderStatus | null;
+  readonly Worker: AsyncItem<Worker | undefined>;
+  readonly userID: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly orderWorkerId?: string | null;
@@ -133,15 +134,14 @@ type EagerWorker = {
   readonly rating?: number | null;
   readonly lat: number;
   readonly lng: number;
-  readonly transportationMode: TransportationModes | keyof typeof TransportationModes;
   readonly services?: string | null;
   readonly gender: string;
-  readonly profession: string;
-  readonly languages: string;
+  readonly profession?: string | null;
   readonly experienceDescription: string;
   readonly bio: string;
   readonly sub: string;
   readonly isVerified: boolean;
+  readonly transportationMode?: TransportationModes | keyof typeof TransportationModes | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -153,15 +153,14 @@ type LazyWorker = {
   readonly rating?: number | null;
   readonly lat: number;
   readonly lng: number;
-  readonly transportationMode: TransportationModes | keyof typeof TransportationModes;
   readonly services?: string | null;
   readonly gender: string;
-  readonly profession: string;
-  readonly languages: string;
+  readonly profession?: string | null;
   readonly experienceDescription: string;
   readonly bio: string;
   readonly sub: string;
   readonly isVerified: boolean;
+  readonly transportationMode?: TransportationModes | keyof typeof TransportationModes | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -174,56 +173,58 @@ export declare const Worker: (new (init: ModelInit<Worker, WorkerMetaData>) => W
 
 type EagerUser = {
   readonly id: string;
+  readonly ver: number;
   readonly sub: string;
-  readonly address: string;
   readonly lat: number;
   readonly lng: number;
   readonly firstname: string;
   readonly lastname: string;
-  readonly ver: number;
+  readonly gender: string;
   readonly dob: string;
   readonly email: string;
   readonly contactnum: string;
-  readonly Orders?: (Order | null)[] | null;
+  readonly emergency: string;
+  readonly address: string;
+  readonly detailedaddress?: string | null;
   readonly postalcode: string;
   readonly bio?: string | null;
-  readonly gender: string;
-  readonly emergency: string;
-  readonly mobility: Caretype | keyof typeof Caretype;
-  readonly feeding: Caretype | keyof typeof Caretype;
-  readonly toileting: Caretype | keyof typeof Caretype;
-  readonly bathing: Caretype | keyof typeof Caretype;
-  readonly mealprep: Caretype | keyof typeof Caretype;
+  readonly mobility: CareType | keyof typeof CareType;
+  readonly toileting: CareType | keyof typeof CareType;
+  readonly feeding: CareType | keyof typeof CareType;
+  readonly bathing: CareType | keyof typeof CareType;
+  readonly mealprep: CareType | keyof typeof CareType;
   readonly allergies: string;
   readonly diagnosis: string;
+  readonly Orders?: (Order | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
 
 type LazyUser = {
   readonly id: string;
+  readonly ver: number;
   readonly sub: string;
-  readonly address: string;
   readonly lat: number;
   readonly lng: number;
   readonly firstname: string;
   readonly lastname: string;
-  readonly ver: number;
+  readonly gender: string;
   readonly dob: string;
   readonly email: string;
   readonly contactnum: string;
-  readonly Orders: AsyncCollection<Order>;
+  readonly emergency: string;
+  readonly address: string;
+  readonly detailedaddress?: string | null;
   readonly postalcode: string;
   readonly bio?: string | null;
-  readonly gender: string;
-  readonly emergency: string;
-  readonly mobility: Caretype | keyof typeof Caretype;
-  readonly feeding: Caretype | keyof typeof Caretype;
-  readonly toileting: Caretype | keyof typeof Caretype;
-  readonly bathing: Caretype | keyof typeof Caretype;
-  readonly mealprep: Caretype | keyof typeof Caretype;
+  readonly mobility: CareType | keyof typeof CareType;
+  readonly toileting: CareType | keyof typeof CareType;
+  readonly feeding: CareType | keyof typeof CareType;
+  readonly bathing: CareType | keyof typeof CareType;
+  readonly mealprep: CareType | keyof typeof CareType;
   readonly allergies: string;
   readonly diagnosis: string;
+  readonly Orders: AsyncCollection<Order>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

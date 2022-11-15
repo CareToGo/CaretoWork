@@ -7,11 +7,11 @@ const AuthContext = createContext({});
 const AuthContextProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState(null);
   const [dbWorker, setDbWorker] = useState(null);
-  const sub = authUser?.attributes?.sub;
-
+  const [sub, setSub] = useState(null);
   const fetchsub = async () => {
     Auth.currentAuthenticatedUser()
       .then((results) => {
+        setSub(results.attributes.sub);
         setAuthUser(results);
         queryWorker(results.attributes.sub);
       })

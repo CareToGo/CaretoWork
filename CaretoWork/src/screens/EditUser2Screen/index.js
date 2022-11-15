@@ -49,7 +49,7 @@ const EditUser2Screen = () => {
   const [experienceDescription, setExperienceDescription] = useState("");
   const [bio, setBio] = useState("");
   const [transportationMode, setTransportationMode] = useState(
-    TransportationModes.BICYCLING
+    TransportationModes.BICYCLE
   );
   const navigation = useNavigation();
   const [imageData, setImageData] = useState(null);
@@ -317,12 +317,10 @@ const EditUser2Screen = () => {
 
           <View style={{ flexDirection: "row" }}>
             <Pressable
-              onPress={() =>
-                setTransportationMode(TransportationModes.BICYCLING)
-              }
+              onPress={() => setTransportationMode(TransportationModes.BICYCLE)}
               style={{
                 backgroundColor:
-                  transportationMode == TransportationModes.BICYCLING
+                  transportationMode == TransportationModes.BICYCLE
                     ? "lightgreen"
                     : "white",
                 margin: 10,

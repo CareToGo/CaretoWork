@@ -52,7 +52,7 @@ const EditUserProfile = () => {
   const [bio, setBio] = useState("");
   const [address, setAddress] = useState("");
   const [transportationMode, setTransportationMode] = useState(
-    TransportationModes.BICYCLING
+    TransportationModes.BICYCLE
   );
   const [services, setServices] = useState([]);
 
@@ -295,7 +295,7 @@ const EditUserProfile = () => {
             data={Profession}
             defaultButtonText="Select a Profession"
             onSelect={(selectedItem, index) => {
-              setGender(selectedItem);
+              setProfession(selectedItem);
             }}
             buttonTextAfterSelection={(selectedItem, index) => {
               // text represented after item is selected
@@ -341,12 +341,10 @@ const EditUserProfile = () => {
 
           <View style={{ flexDirection: "row" }}>
             <Pressable
-              onPress={() =>
-                setTransportationMode(TransportationModes.BICYCLING)
-              }
+              onPress={() => setTransportationMode(TransportationModes.BICYCLE)}
               style={{
                 backgroundColor:
-                  transportationMode == TransportationModes.BICYCLING
+                  transportationMode == TransportationModes.BICYCLE
                     ? "lightgreen"
                     : "white",
                 margin: 10,
@@ -359,10 +357,10 @@ const EditUserProfile = () => {
               <MaterialIcons name="pedal-bike" size={40} color="black" />
             </Pressable>
             <Pressable
-              onPress={() => setTransportationMode(TransportationModes.DRIVING)}
+              onPress={() => setTransportationMode(TransportationModes.CAR)}
               style={{
                 backgroundColor:
-                  transportationMode == TransportationModes.DRIVING
+                  transportationMode == TransportationModes.CAR
                     ? "lightgreen"
                     : "white",
                 margin: 10,
