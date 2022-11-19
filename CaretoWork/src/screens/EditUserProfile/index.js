@@ -26,7 +26,8 @@ import * as ImagePicker from "expo-image-picker";
 import SelectDropdown from "react-native-select-dropdown";
 
 const EditUserProfile = () => {
-  const { dbWorker, sub, setDbWorker } = useAuthContext();
+  const { dbWorker, setDbWorker } = useAuthContext();
+
   const Language = [
     "English",
     "French",
@@ -55,6 +56,7 @@ const EditUserProfile = () => {
     TransportationModes.BICYCLE
   );
   const [services, setServices] = useState([]);
+  const [sub, setSub] = useState("");
 
   const navigation = useNavigation();
 
@@ -75,9 +77,19 @@ const EditUserProfile = () => {
       }
     );
   };
-
+  const fetchsub = async () => {
+    Auth.currentAuthenticatedUser()
+      .then((results) => {
+        setSub(results.attributes.sub);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   useEffect(() => {
     queryPSWService();
+    fetchsub();
+    console.log(sub);
   }, []);
 
   useEffect(() => {
@@ -96,10 +108,9 @@ const EditUserProfile = () => {
     })();
   }, []);
 
-  const onSignOutPressed = async () => {
+  const onSignOutPressed = () => {
     try {
-      await Auth.signOut();
-      navigation.navigate("SignIn");
+      Auth.signOut();
     } catch (e) {
       Alert.alert("Oops", e.message);
     }
@@ -170,9 +181,10 @@ const EditUserProfile = () => {
   const onSave = async () => {
     if (dbWorker) {
       await updateWorker();
-      navigation.goBack();
+      navigation.navigate("RequestsScreen");
     } else {
       await createWorker();
+      navigation.navigate("RequestsScreen");
     }
   };
 

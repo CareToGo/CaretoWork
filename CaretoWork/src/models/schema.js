@@ -31,6 +31,13 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "type": {
+                    "name": "type",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -101,6 +108,13 @@ export const schema = {
                     "name": "price",
                     "isArray": false,
                     "type": "Float",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "type": {
+                    "name": "type",
+                    "isArray": false,
+                    "type": "String",
                     "isRequired": true,
                     "attributes": []
                 },
@@ -331,18 +345,18 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "services": {
-                    "name": "services",
+                "pswServices": {
+                    "name": "pswServices",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
-                "gender": {
-                    "name": "gender",
+                "nursingServices": {
+                    "name": "nursingServices",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
+                    "isRequired": false,
                     "attributes": []
                 },
                 "profession": {
@@ -387,6 +401,13 @@ export const schema = {
                         "enum": "TransportationModes"
                     },
                     "isRequired": false,
+                    "attributes": []
+                },
+                "gender": {
+                    "name": "gender",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
                     "attributes": []
                 },
                 "createdAt": {
@@ -691,5 +712,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.3.1",
-    "version": "291f08f69e6308462ab75b67dc12c400"
+    "version": "e27ab0938ab384d280f31e6eaad8d19e"
 };

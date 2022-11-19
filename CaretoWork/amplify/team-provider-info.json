@@ -17,6 +17,20 @@
       },
       "storage": {
         "caretogo": {}
+      },
+      "function": {
+        "CreatePaymentIntent": {
+          "deploymentBucketName": "amplify-caretogoapp-staging-234315-deployment",
+          "s3Key": "amplify-builds/CreatePaymentIntent-585779546951442b5636-build.zip"
+        },
+        "StripeWebhook": {
+          "deploymentBucketName": "amplify-caretogoapp-staging-234315-deployment",
+          "s3Key": "amplify-builds/StripeWebhook-2b684b584c6b2f727045-build.zip"
+        }
+      },
+      "api": {
+        "CareToGoAPP": {},
+        "StripeWebhook": {}
       }
     }
   }

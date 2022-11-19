@@ -74,7 +74,6 @@ const EditUser2Screen = () => {
   const onSignOutPressed = async () => {
     try {
       await Auth.signOut();
-      navigation.navigate("SignIn");
     } catch (e) {
       Alert.alert("Oops", e.message);
     }

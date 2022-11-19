@@ -11,11 +11,28 @@ import NewPasswordScreen from "../screens/NewPasswordScreen";
 import EditUser2Screen from "../screens/EditUser2Screen";
 import { View, ActivityIndicator } from "react-native";
 import EditServicesScreen from "../screens/EditServicesScreen";
+import { Auth } from "aws-amplify";
+import { useEffect, useState } from "react";
 
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
   const { dbWorker, authUser } = useAuthContext();
+  const [worker, setWorker] = useState(undefined);
+
+  const checkWorker = async () => {
+    try {
+      const authWorker = await Auth.currentAuthenticatedUser({
+        bypassCache: true,
+      });
+      setWorker(authWorker);
+    } catch (e) {
+      setWorker(null);
+    }
+  };
+  useEffect(() => {
+    checkWorker();
+  });
   if (authUser === undefined) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -23,9 +40,10 @@ const Navigation = () => {
       </View>
     );
   }
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {authUser && dbWorker ? (
+      {worker && dbWorker ? (
         <>
           <Stack.Screen name="RequestsScreen" component={RequestsScreen} />
           <Stack.Screen name="AcceptScreen" component={AcceptScreen} />

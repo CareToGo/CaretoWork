@@ -3,6 +3,7 @@ type PSWService @model @auth(rules: [{allow: public}]) {
   name: String!
   description: String!
   price: Float!
+  type: String!
 }
 
 type NurseService @model @auth(rules: [{allow: public}]) {
@@ -10,6 +11,7 @@ type NurseService @model @auth(rules: [{allow: public}]) {
   name: String!
   description: String!
   price: Float!
+  type: String!
 }
 
 enum OrderStatus {
@@ -78,13 +80,14 @@ type Worker @model @auth(rules: [{allow: public}]) {
   rating: Float
   lat: Float!
   lng: Float!
-  services: String
-  gender: String!
+  pswServices: String
+  nursingServices: String
   profession: String
   experienceDescription: String!
   bio: String!
   sub: String!
   isVerified: Boolean!
   transportationMode: TransportationModes
+  gender: String!
 }
  

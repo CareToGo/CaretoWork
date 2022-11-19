@@ -8,6 +8,7 @@ const AuthContextProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState(null);
   const [dbWorker, setDbWorker] = useState(null);
   const [sub, setSub] = useState(null);
+
   const fetchsub = async () => {
     Auth.currentAuthenticatedUser()
       .then((results) => {
@@ -28,14 +29,10 @@ const AuthContextProvider = ({ children }) => {
       setDbWorker(items[0]);
     });
   };
+
   useEffect(() => {
     fetchsub();
   }, []);
-  // useEffect(() => {
-  //   DataStore.query(Worker, (worker) => worker.sub("eq", sub)).then((workers) =>
-  //     setDbWorker(workers[0])
-  //   );
-  // }, [sub]);
 
   return (
     <AuthContext.Provider value={{ authUser, dbWorker, sub, setDbWorker }}>

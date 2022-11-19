@@ -46,6 +46,7 @@ type EagerPSWService = {
   readonly name: string;
   readonly description: string;
   readonly price: number;
+  readonly type: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -55,6 +56,7 @@ type LazyPSWService = {
   readonly name: string;
   readonly description: string;
   readonly price: number;
+  readonly type: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -70,6 +72,7 @@ type EagerNurseService = {
   readonly name: string;
   readonly description: string;
   readonly price: number;
+  readonly type: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -79,6 +82,7 @@ type LazyNurseService = {
   readonly name: string;
   readonly description: string;
   readonly price: number;
+  readonly type: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -134,14 +138,15 @@ type EagerWorker = {
   readonly rating?: number | null;
   readonly lat: number;
   readonly lng: number;
-  readonly services?: string | null;
-  readonly gender: string;
+  readonly pswServices?: string | null;
+  readonly nursingServices?: string | null;
   readonly profession?: string | null;
   readonly experienceDescription: string;
   readonly bio: string;
   readonly sub: string;
   readonly isVerified: boolean;
   readonly transportationMode?: TransportationModes | keyof typeof TransportationModes | null;
+  readonly gender: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -153,14 +158,15 @@ type LazyWorker = {
   readonly rating?: number | null;
   readonly lat: number;
   readonly lng: number;
-  readonly services?: string | null;
-  readonly gender: string;
+  readonly pswServices?: string | null;
+  readonly nursingServices?: string | null;
   readonly profession?: string | null;
   readonly experienceDescription: string;
   readonly bio: string;
   readonly sub: string;
   readonly isVerified: boolean;
   readonly transportationMode?: TransportationModes | keyof typeof TransportationModes | null;
+  readonly gender: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
