@@ -33,6 +33,15 @@ const EditServiceScreen = () => {
 
   const [isEnabled, setIsEnabled] = useState(false);
 
+  const queryWorker = async (arg) => {
+    const subscription = DataStore.observeQuery(Worker, (worker) =>
+      worker.sub("eq", arg)
+    ).subscribe((snapshot) => {
+      const { items } = snapshot;
+      setDbWorker(items[0]);
+    });
+  };
+
   const personalSupport = () => {
     setIsEnabled(false);
   };
@@ -71,6 +80,7 @@ const EditServiceScreen = () => {
   useEffect(() => {
     queryPSWService();
     queryNurseService();
+    queryWorker(dbWorker.sub);
   }, []);
 
   const onSave = async () => {
@@ -79,9 +89,6 @@ const EditServiceScreen = () => {
   };
 
   const updateWorker = async () => {
-    let totalService = [...services, ...nurseServices];
-
-    console.log(totalService[0]);
     Object.keys(selected).forEach(function (key) {
       if (selected[key] == false) {
         delete selected[key];
@@ -91,12 +98,14 @@ const EditServiceScreen = () => {
 
     let service_array = [];
     service_array = services.filter((g) => keys.includes(g.id)).map((g) => g);
-
+    console.log(service_array);
     let nurse_service_array = [];
     nurse_service_array = nurseServices
       .filter((g) => keys.includes(g.id))
       .map((g) => g);
+    console.log(nurse_service_array);
     try {
+      console.log(dbWorker);
       const worker = await DataStore.save(
         Worker.copyOf(dbWorker, (updated) => {
           updated.pswServices = JSON.stringify(service_array);
