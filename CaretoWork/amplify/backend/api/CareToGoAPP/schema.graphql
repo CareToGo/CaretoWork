@@ -1,3 +1,14 @@
+type OrderView @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  date: String!
+  lat: Float!
+  lng: Float!
+  address: String!
+  name: String!
+  userID: ID! @index(name: "byUser")
+  services: String!
+}
+
 type PSWService @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String!
@@ -32,6 +43,7 @@ type Order @model @auth(rules: [{allow: public}]) {
   status: OrderStatus
   Worker: Worker @hasOne
   userID: ID! @index(name: "byUser")
+  time: String!
 }
 
 enum TransportationModes {
@@ -42,7 +54,7 @@ enum TransportationModes {
 
 enum CareType {
   TOTALCARE
-  SOMEASSITANCE
+  SOMEASSISTANCE
   INDEPENDENT
 }
 
@@ -63,14 +75,16 @@ type User @model @auth(rules: [{allow: public}]) {
   detailedaddress: String
   postalcode: String!
   bio: String
-  mobility: CareType!
+  grooming: CareType!
   toileting: CareType!
   feeding: CareType!
   bathing: CareType!
   mealprep: CareType!
-  allergies: String!
+  mobility: CareType!
   diagnosis: String!
   Orders: [Order] @hasMany(indexName: "byUser", fields: ["id"])
+  allergies: String!
+  OrderViews: [OrderView] @hasMany(indexName: "byUser", fields: ["id"])
 }
 
 type Worker @model @auth(rules: [{allow: public}]) {
@@ -83,11 +97,13 @@ type Worker @model @auth(rules: [{allow: public}]) {
   pswServices: String
   nursingServices: String
   profession: String
-  experienceDescription: String!
+  experience: Int
   bio: String!
   sub: String!
   isVerified: Boolean!
   transportationMode: TransportationModes
   gender: String!
+  isInsured: Boolean!
+  languages: String
 }
  

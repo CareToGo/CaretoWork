@@ -110,6 +110,9 @@ const EditServiceScreen = () => {
         Worker.copyOf(dbWorker, (updated) => {
           updated.pswServices = JSON.stringify(service_array);
           updated.nursingServices = JSON.stringify(nurse_service_array);
+
+          // updated._version = parseInt(dbUser.ver);
+          // updated.ver = parseInt(dbUser.ver + 1);
         })
       );
       setDbWorker(worker);
@@ -168,9 +171,8 @@ const EditServiceScreen = () => {
                   newSelected[item.id] = !newSelected[item.id];
                   setSelected(newSelected);
                 }}
-                style={tw`flex-row items-center justify-between p-5 ${
-                  selected[id] && "bg-gray-200"
-                }`}
+                style={tw`flex-row items-center justify-between p-5 ${selected[id] && "bg-gray-200"
+                  }`}
               >
                 <View style={tw`w-4/5`}>
                   <Text style={tw`font-semibold text-lg`}>{name}</Text>
@@ -227,9 +229,8 @@ const EditServiceScreen = () => {
                   newSelected[item.id] = !newSelected[item.id];
                   setSelected(newSelected);
                 }}
-                style={tw`flex-row items-center justify-between p-5 ${
-                  selected[id] && "bg-gray-200"
-                }`}
+                style={tw`flex-row items-center justify-between p-5 ${selected[id] && "bg-gray-200"
+                  }`}
               >
                 <View style={tw`w-4/5`}>
                   <Text style={tw`font-semibold text-lg`}>{name}</Text>
@@ -243,6 +244,11 @@ const EditServiceScreen = () => {
           />
         )}
       </View>
+      <Button
+        onPress={onSave}
+        title="Save"
+        style={{ margin: 10, backgroundColor: "blue" }}
+      />
     </SafeAreaView>
   );
 };

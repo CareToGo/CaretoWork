@@ -24,6 +24,7 @@ const ForgotPasswordScreen = () => {
   const onSignInPressed = () => {
     navigation.navigate("SignIn");
   };
+  
   const onSendPressed = async (data) => {
     try {
       await Auth.forgotPassword(data.username);
@@ -35,7 +36,6 @@ const ForgotPasswordScreen = () => {
 
   return (
     <SafeAreaView>
-      <ScrollView>
         <View style={styles.root}>
           <Text style={styles.title}>Reset Your Password</Text>
 
@@ -60,7 +60,6 @@ const ForgotPasswordScreen = () => {
             type="TERTIARY"
           />
         </View>
-      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -72,6 +71,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "F9FBFC",
+    marginTop: '18%'
   },
   logo: {
     width: "70%",

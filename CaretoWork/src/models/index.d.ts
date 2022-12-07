@@ -17,8 +17,12 @@ export enum TransportationModes {
 
 export enum CareType {
   TOTALCARE = "TOTALCARE",
-  SOMEASSITANCE = "SOMEASSITANCE",
+  SOMEASSISTANCE = "SOMEASSISTANCE",
   INDEPENDENT = "INDEPENDENT"
+}
+
+type OrderViewMetaData = {
+  readOnlyFields: 'createdAt' | 'updatedAt';
 }
 
 type PSWServiceMetaData = {
@@ -39,6 +43,38 @@ type WorkerMetaData = {
 
 type UserMetaData = {
   readOnlyFields: 'createdAt' | 'updatedAt';
+}
+
+type EagerOrderView = {
+  readonly id: string;
+  readonly date: string;
+  readonly lat: number;
+  readonly lng: number;
+  readonly address: string;
+  readonly name: string;
+  readonly userID: string;
+  readonly services: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyOrderView = {
+  readonly id: string;
+  readonly date: string;
+  readonly lat: number;
+  readonly lng: number;
+  readonly address: string;
+  readonly name: string;
+  readonly userID: string;
+  readonly services: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type OrderView = LazyLoading extends LazyLoadingDisabled ? EagerOrderView : LazyOrderView
+
+export declare const OrderView: (new (init: ModelInit<OrderView, OrderViewMetaData>) => OrderView) & {
+  copyOf(source: OrderView, mutator: (draft: MutableModel<OrderView, OrderViewMetaData>) => MutableModel<OrderView, OrderViewMetaData> | void): OrderView;
 }
 
 type EagerPSWService = {
@@ -104,6 +140,7 @@ type EagerOrder = {
   readonly status?: OrderStatus | keyof typeof OrderStatus | null;
   readonly Worker?: Worker | null;
   readonly userID: string;
+  readonly time: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly orderWorkerId?: string | null;
@@ -120,6 +157,7 @@ type LazyOrder = {
   readonly status?: OrderStatus | keyof typeof OrderStatus | null;
   readonly Worker: AsyncItem<Worker | undefined>;
   readonly userID: string;
+  readonly time: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly orderWorkerId?: string | null;
@@ -141,12 +179,14 @@ type EagerWorker = {
   readonly pswServices?: string | null;
   readonly nursingServices?: string | null;
   readonly profession?: string | null;
-  readonly experienceDescription: string;
+  readonly experience?: number | null;
   readonly bio: string;
   readonly sub: string;
   readonly isVerified: boolean;
   readonly transportationMode?: TransportationModes | keyof typeof TransportationModes | null;
   readonly gender: string;
+  readonly isInsured: boolean;
+  readonly languages?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -161,12 +201,14 @@ type LazyWorker = {
   readonly pswServices?: string | null;
   readonly nursingServices?: string | null;
   readonly profession?: string | null;
-  readonly experienceDescription: string;
+  readonly experience?: number | null;
   readonly bio: string;
   readonly sub: string;
   readonly isVerified: boolean;
   readonly transportationMode?: TransportationModes | keyof typeof TransportationModes | null;
   readonly gender: string;
+  readonly isInsured: boolean;
+  readonly languages?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -194,14 +236,16 @@ type EagerUser = {
   readonly detailedaddress?: string | null;
   readonly postalcode: string;
   readonly bio?: string | null;
-  readonly mobility: CareType | keyof typeof CareType;
+  readonly grooming: CareType | keyof typeof CareType;
   readonly toileting: CareType | keyof typeof CareType;
   readonly feeding: CareType | keyof typeof CareType;
   readonly bathing: CareType | keyof typeof CareType;
   readonly mealprep: CareType | keyof typeof CareType;
-  readonly allergies: string;
+  readonly mobility: CareType | keyof typeof CareType;
   readonly diagnosis: string;
   readonly Orders?: (Order | null)[] | null;
+  readonly allergies: string;
+  readonly OrderViews?: (OrderView | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -223,14 +267,16 @@ type LazyUser = {
   readonly detailedaddress?: string | null;
   readonly postalcode: string;
   readonly bio?: string | null;
-  readonly mobility: CareType | keyof typeof CareType;
+  readonly grooming: CareType | keyof typeof CareType;
   readonly toileting: CareType | keyof typeof CareType;
   readonly feeding: CareType | keyof typeof CareType;
   readonly bathing: CareType | keyof typeof CareType;
   readonly mealprep: CareType | keyof typeof CareType;
-  readonly allergies: string;
+  readonly mobility: CareType | keyof typeof CareType;
   readonly diagnosis: string;
   readonly Orders: AsyncCollection<Order>;
+  readonly allergies: string;
+  readonly OrderViews: AsyncCollection<OrderView>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

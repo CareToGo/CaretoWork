@@ -2,12 +2,9 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
-  useWindowDimensions,
   Alert,
 } from "react-native";
 import React, { useState } from "react";
-
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { ScrollView } from "react-native-gesture-handler";
@@ -16,9 +13,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { Auth } from "aws-amplify";
 
-const PASSWORD_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 const PHONE_REGEX = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
 const SignUpScreen = () => {
@@ -39,15 +35,19 @@ const SignUpScreen = () => {
       Alert.alert("Oops", e.message);
     }
   };
+
   const onTermsOfUsePressed = () => {
     console.warn("Term of Use");
   };
+
   const onPrivacyPressed = () => {
     console.warn("Privacy");
   };
+
   const onSignPressed = () => {
     navigation.navigate("SignIn");
   };
+
   return (
     <SafeAreaView>
       <ScrollView>

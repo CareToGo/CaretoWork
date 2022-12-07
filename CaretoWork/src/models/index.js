@@ -17,13 +17,14 @@ const TransportationModes = {
 
 const CareType = {
   "TOTALCARE": "TOTALCARE",
-  "SOMEASSITANCE": "SOMEASSITANCE",
+  "SOMEASSISTANCE": "SOMEASSISTANCE",
   "INDEPENDENT": "INDEPENDENT"
 };
 
-const { PSWService, NurseService, Order, Worker, User } = initSchema(schema);
+const { OrderView, PSWService, NurseService, Order, Worker, User } = initSchema(schema);
 
 export {
+  OrderView,
   PSWService,
   NurseService,
   Order,

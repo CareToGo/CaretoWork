@@ -2,7 +2,7 @@ import {
   StyleSheet,
   View,
   Image,
-  useWindowDimensions,
+  Dimensions,
   SafeAreaView,
   Alert,
 } from "react-native";
@@ -10,26 +10,22 @@ import React, { useState } from "react";
 import Logo from "../../../assets/C2G.png";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
-import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { Auth } from "aws-amplify";
+import { useAuthContext } from "../../contexts/AuthContext";
 
-const PASSWORD_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const PHONE_REGEX = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
 const SignInScreen = () => {
-  const { height } = useWindowDimensions();
+  const { authUser, setAuthUser } = useAuthContext();
   const [loading, setLoading] = useState(false);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
   const navigation = useNavigation();
+  const { control, handleSubmit, formState: { errors } } = useForm();
+  
   const onSignInPressed = async (data) => {
     if (loading) {
       return;
@@ -37,26 +33,28 @@ const SignInScreen = () => {
     setLoading(true);
     try {
       const auth = await Auth.signIn(data.email, data.password);
-
-      navigation.navigate("EditUserProfile");
+      setAuthUser(auth)
     } catch (e) {
       Alert.alert("Oops", e.message);
     }
     setLoading(false);
   };
+
   const onForgotPasswordPressed = () => {
     navigation.navigate("ForgotPassword");
   };
+
   const onSignUpPressed = () => {
     navigation.navigate("SignUp");
   };
+
   return (
     <SafeAreaView>
-      <ScrollView>
+      <View>
         <View style={styles.root}>
           <Image
             source={Logo}
-            style={[styles.logo, { height: height * 0.3 }]}
+            style={styles.logo}
             resizeMode="contain"
           />
           <CustomInput
@@ -105,7 +103,7 @@ const SignInScreen = () => {
             type="TERTIARY"
           />
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -115,12 +113,13 @@ export default SignInScreen;
 const styles = StyleSheet.create({
   root: {
     alignItems: "center",
-    padding: 20,
+    padding: '6%',
     backgroundColor: "F9FBFC",
   },
   logo: {
     width: "70%",
     maxHeight: 200,
     maxWidth: 300,
+    marginTop: '21%'
   },
 });

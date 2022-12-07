@@ -2,12 +2,9 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
-  useWindowDimensions,
   Alert,
 } from "react-native";
 import React, { useState } from "react";
-import Logo from "../../../assets/C2G.png";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { ScrollView } from "react-native-gesture-handler";
@@ -43,9 +40,11 @@ const ConfirmEmailScreen = () => {
       Alert.alert("Oops", e.message);
     }
   };
+
   const onSignInPressed = () => {
     navigation.navigate("SignIn");
   };
+  
   return (
     <SafeAreaView>
       <ScrollView>

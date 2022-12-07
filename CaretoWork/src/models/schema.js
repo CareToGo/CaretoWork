@@ -1,5 +1,115 @@
 export const schema = {
     "models": {
+        "OrderView": {
+            "name": "OrderView",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "date": {
+                    "name": "date",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "lat": {
+                    "name": "lat",
+                    "isArray": false,
+                    "type": "Float",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "lng": {
+                    "name": "lng",
+                    "isArray": false,
+                    "type": "Float",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "address": {
+                    "name": "address",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "name": {
+                    "name": "name",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "userID": {
+                    "name": "userID",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "services": {
+                    "name": "services",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                }
+            },
+            "syncable": true,
+            "pluralName": "OrderViews",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byUser",
+                        "fields": [
+                            "userID"
+                        ]
+                    }
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
         "PSWService": {
             "name": "PSWService",
             "fields": {
@@ -242,6 +352,13 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "time": {
+                    "name": "time",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -366,11 +483,11 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "experienceDescription": {
-                    "name": "experienceDescription",
+                "experience": {
+                    "name": "experience",
                     "isArray": false,
-                    "type": "String",
-                    "isRequired": true,
+                    "type": "Int",
+                    "isRequired": false,
                     "attributes": []
                 },
                 "bio": {
@@ -408,6 +525,20 @@ export const schema = {
                     "isArray": false,
                     "type": "String",
                     "isRequired": true,
+                    "attributes": []
+                },
+                "isInsured": {
+                    "name": "isInsured",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "languages": {
+                    "name": "languages",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
                     "attributes": []
                 },
                 "createdAt": {
@@ -567,8 +698,8 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "mobility": {
-                    "name": "mobility",
+                "grooming": {
+                    "name": "grooming",
                     "isArray": false,
                     "type": {
                         "enum": "CareType"
@@ -612,10 +743,12 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "allergies": {
-                    "name": "allergies",
+                "mobility": {
+                    "name": "mobility",
                     "isArray": false,
-                    "type": "String",
+                    "type": {
+                        "enum": "CareType"
+                    },
                     "isRequired": true,
                     "attributes": []
                 },
@@ -631,6 +764,27 @@ export const schema = {
                     "isArray": true,
                     "type": {
                         "model": "Order"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": "userID"
+                    }
+                },
+                "allergies": {
+                    "name": "allergies",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "OrderViews": {
+                    "name": "OrderViews",
+                    "isArray": true,
+                    "type": {
+                        "model": "OrderView"
                     },
                     "isRequired": false,
                     "attributes": [],
@@ -705,12 +859,12 @@ export const schema = {
             "name": "CareType",
             "values": [
                 "TOTALCARE",
-                "SOMEASSITANCE",
+                "SOMEASSISTANCE",
                 "INDEPENDENT"
             ]
         }
     },
     "nonModels": {},
-    "codegenVersion": "3.3.1",
-    "version": "e27ab0938ab384d280f31e6eaad8d19e"
+    "codegenVersion": "3.3.2",
+    "version": "7f937262e71fca6b6ccfd1f5d222cf94"
 };

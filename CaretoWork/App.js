@@ -1,6 +1,5 @@
-import { useRef } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Image, FlatList } from "react-native";
+import { StyleSheet, KeyboardAvoidingView } from "react-native";
 import Navigation from "./src/navigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { Amplify } from "aws-amplify";
@@ -22,7 +21,14 @@ function App() {
       <GestureHandlerRootView style={styles.container}>
         <AuthContextProvider>
           <OrderContextProvider>
-            <Navigation />
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              style={{ flex: 1 }}
+              keyboardVerticalOffset={Platform.OS === "ios" ? -64 : 0}
+            >
+
+              <Navigation />
+            </KeyboardAvoidingView>
           </OrderContextProvider>
         </AuthContextProvider>
         <StatusBar style="auto" />

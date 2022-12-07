@@ -88,8 +88,8 @@ const EditUserProfile = () => {
   };
   useEffect(() => {
     queryPSWService();
-    fetchsub();
-    console.log(sub);
+    // fetchsub();
+    // console.log(sub);
   }, []);
 
   useEffect(() => {

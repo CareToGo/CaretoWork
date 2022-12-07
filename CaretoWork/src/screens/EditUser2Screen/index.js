@@ -1,4 +1,5 @@
 import {
+  TouchableOpacity,
   View,
   Text,
   TextInput,
@@ -10,23 +11,47 @@ import {
   ScrollView,
   Image,
   Input,
+  Dimensions
 } from "react-native";
+import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import React, { useEffect, useState } from "react";
+import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Auth, DataStore } from "aws-amplify";
 import { TransportationModes, Worker } from "../../models";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome5 } from "@expo/vector-icons";
-import { PSWService } from "../../models";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Progress from "react-native-progress";
 import { Storage } from "aws-amplify";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
-import SelectDropdown from "react-native-select-dropdown";
+import pro1 from "../../../assets/maleprovider.png"
+import pro2 from "../../../assets/femaleprovider.png"
+import { Fontisto } from '@expo/vector-icons';
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const EditUser2Screen = () => {
-  const { dbWorker, sub, setDbWorker } = useAuthContext();
+  const insets = useSafeAreaInsets();
+  const { dbWorker, sub, setDbWorker, setAuthUser } = useAuthContext();
+  const [imageLink, setImageLink] = useState(imageLink? imageLink : null);
+  const [firstName, setFirstName] = useState(dbWorker?.firstName || "");
+  const [lastName, setLastName] = useState(dbWorker?.lastName || "");
+  const [gender, setGender] = useState(dbWorker?.gender || "");
+  const [profession, setProfession] = useState(dbWorker?.profession || "");
+  const [languages, setLanguages] = useState(dbWorker?.languages ? JSON.parse(dbWorker.languages) : []);
+  const [experience, setExperience] = useState(dbWorker?.experience || 0);
+  const [isInsured, setIsinsured] = useState(dbWorker?.isInsured || false);
+  const [bio, setBio] = useState("");
+  const [transportationMode, setTransportationMode] = useState(
+    dbWorker?.transportationMode || TransportationModes.WALK
+  );
+  const navigation = useNavigation();
+  const [percentage, setPercentage] = useState(0);
   const Language = [
     "English",
     "French",
@@ -38,22 +63,10 @@ const EditUser2Screen = () => {
     "Portuguese",
     "Italian",
   ];
-  const Gender = ["Male", "Female", "Other"];
-  const Profession = ["RN", "RPN", "PSW"];
 
-  const [firstName, setFirstName] = useState(dbWorker?.firstName || "");
-  const [lastName, setLastName] = useState("");
-  const [gender, setGender] = useState("");
-  const [profession, setProfession] = useState("");
-  const [languages, setLanguages] = useState("");
-  const [experienceDescription, setExperienceDescription] = useState("");
-  const [bio, setBio] = useState("");
-  const [transportationMode, setTransportationMode] = useState(
-    TransportationModes.BICYCLE
-  );
-  const navigation = useNavigation();
-  const [imageData, setImageData] = useState(null);
-  const [percentage, setPercentage] = useState(0);
+  useEffect(() => {
+    console.log('image',imageLink)
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -71,40 +84,50 @@ const EditUser2Screen = () => {
     })();
   }, []);
 
-  const onSignOutPressed = async () => {
-    try {
-      await Auth.signOut();
-    } catch (e) {
-      Alert.alert("Oops", e.message);
-    }
+  const fetchLink = async () => {
+    Storage.get(`${sub}.jpg`)
+      .then((mylink) => setImageLink(mylink))
+      .catch((e) => console.log(e));
   };
+
+  useEffect(() => {
+    fetchLink();
+  }, []);
+
+  const onSignOutPressed = async () => {
+    // await DataStore.clear();
+    await Auth.signOut();
+    setAuthUser(null);
+  };
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
       mediaTypes: "Images",
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 1,
     });
-
     handleImagePicked(result);
   };
 
   const handleImagePicked = async (pickerResult) => {
     try {
       if (pickerResult.cancelled) {
-        alert("Upload cancelled");
+        alert("Upload Cancelled");
         return;
       } else {
         setPercentage(0);
         const img = await fetchImageFromUri(pickerResult.uri);
         const uploadUrl = await uploadImage(`${sub}.jpg`, img);
+        console.log(uploadUrl);
         const result = await Storage.get(uploadUrl);
-        setImageData(result);
-        setImageData((state) => {
-          return state;
-        });
+        console.log(result);
+        setImageLink(result);
+        setPercentage(0);
       }
     } catch (e) {
-      alert("Upload failed");
+      console.log(e);
+      alert("Upload Failed!");
     }
   };
 
@@ -155,230 +178,523 @@ const EditUser2Screen = () => {
       Worker.copyOf(dbWorker, (updated) => {
         updated.firstName = firstName;
         updated.lastName = lastName;
+        updated.gender = gender;
+        updated.profession = profession;
+        updated.experience = parseInt(experience);
+        updated.isInsured = isInsured;
+        updated.languages = JSON.stringify(languages);
         updated.transportationMode = transportationMode;
-        updated.image = imageData;
       })
     );
     setDbWorker(worker);
   };
 
-  const createWorker = async () => {
-    try {
-      const worker = await DataStore.save(
-        new Worker({
-          sub,
-          lat: 0,
-          lng: 0,
-          firstName,
-          lastName,
-          transportationMode,
-          gender,
-          profession,
-          languages,
-          experienceDescription,
-          bio,
-          isVerified: false,
-        })
-      );
-      console.log(worker);
-      setDbWorker(worker);
-    } catch (e) {
-      Alert.alert("Error", e.message);
+  const changeGender = () => {
+    if (gender == "Male") {
+      setGender("Female");
+    } else if (gender == "Female") {
+      setGender("Other");
+    } else if (gender == "Other") {
+      setGender("Male");
+    }
+  };
+
+  const changeProf = () => {
+    if (profession == "PSW" || profession == "") {
+      setProfession("RN");
+    } else if (profession == "RN") {
+      setProfession("RPN");
+    } else if (profession == "RPN") {
+      setProfession("PSW");
     }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View
-        style={{
-          width: "100%",
-          borderWidth: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {imageData ? (
-          <Image
-            source={{
-              uri: imageData,
-            }}
-            style={{
-              width: "30%",
-              height: undefined,
-              aspectRatio: 1,
-              borderRadius: 100,
-            }}
-          />
-        ) : (
-          <Image
-            source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqXhATMW-sSeAdbYfIGpe9hNhBCo_S_T1EblnSnfKYMw&s",
-            }}
-            style={{
-              width: "30%",
-              height: undefined,
-              aspectRatio: 1,
-              borderRadius: 100,
-            }}
-          />
-        )}
-      </View>
-
-      <ScrollView>
-        <View>
+    <View style={{ flex: 1, alignItems: 'center', paddingTop: (Platform.OS === "ios" ? 0 : insets.top ) }}>
+      {/* TOP BACK PART */}
+      <View style={{ ...styles.topstatic, top: (Platform.OS === "ios" ? insets.top - 10 : insets.top + 10) }}>
+        <Image
+          source={pro1}
+          style={{
+            height: SCREEN_HEIGHT / 6,
+            resizeMode: 'contain',
+            position: 'absolute',
+            left: -30,
+            bottom: -10,
+            opacity: 0.6
+          }}
+        />
+        <Image
+          source={pro2}
+          style={{
+            height: SCREEN_HEIGHT / 6,
+            resizeMode: 'contain',
+            position: 'absolute',
+            right: -30,
+            bottom: -10,
+            opacity: 0.6
+          }}
+        />
+        <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
           <Text style={styles.title}>Edit My Profile</Text>
-          <View style={styles.container}>
-            {percentage !== 0 && (
-              <Text style={styles.percentage}>{percentage}%</Text>
-            )}
-
-            <Button
-              onPress={pickImage}
-              title="Pick an image from camera roll"
-            />
+          <View style={{ width: "100%", justifyContent: "center", flexDirection: "row" }} >
+            <TouchableOpacity style={{ width: "25%" }} onPress={pickImage} underlayColor="lightgray" >
+              <Image
+                source={{
+                  uri: (!imageLink ?
+                    ("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqXhATMW-sSeAdbYfIGpe9hNhBCo_S_T1EblnSnfKYMw&s") :
+                    (imageLink))
+                }}
+                style={{
+                  width: "100%",
+                  height: undefined,
+                  aspectRatio: 1,
+                  borderRadius: 100,
+                  backgroundColor:'lightgray'
+                }}
+              />
+            </TouchableOpacity>
           </View>
-          <TextInput
-            value={firstName}
-            onChangeText={setFirstName}
-            placeholder="First Name"
-            style={styles.input}
-          />
-          <TextInput
-            value={lastName}
-            onChangeText={setLastName}
-            placeholder="Last Name"
-            style={styles.input}
-          />
-          <SelectDropdown
-            data={Gender}
-            defaultButtonText="Select a Gender"
-            onSelect={(selectedItem, index) => {
-              setGender(selectedItem);
-            }}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              // text represented after item is selected
-              // if data array is an array of objects then return selectedItem.property to render after item is selected
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              // text represented for each item in dropdown
-              // if data array is an array of objects then return item.property to represent item in dropdown
-              return item;
-            }}
-          />
-          <SelectDropdown
-            data={Profession}
-            defaultButtonText="Select a Profession"
-            onSelect={(selectedItem, index) => {
-              setProfession(selectedItem);
-            }}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              // text represented after item is selected
-              // if data array is an array of objects then return selectedItem.property to render after item is selected
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              // text represented for each item in dropdown
-              // if data array is an array of objects then return item.property to represent item in dropdown
-              return item;
-            }}
-          />
 
-          <SelectDropdown
-            data={Language}
-            defaultButtonText="Select a Language"
-            onSelect={(selectedItem, index) => {
-              setLanguages(selectedItem);
+          <View
+            style={{
+              width: "100%",
+              height: 21,
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              // text represented after item is selected
-              // if data array is an array of objects then return selectedItem.property to render after item is selected
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              // text represented for each item in dropdown
-              // if data array is an array of objects then return item.property to represent item in dropdown
-              return item;
-            }}
-          />
-          <TextInput
-            value={experienceDescription}
-            onChangeText={setExperienceDescription}
-            placeholder="Experience Description"
-            style={styles.input}
-          />
-          <TextInput
-            value={bio}
-            onChangeText={setBio}
-            placeholder="Bio"
-            style={styles.input}
-          />
-
-          <View style={{ flexDirection: "row" }}>
-            <Pressable
-              onPress={() => setTransportationMode(TransportationModes.BICYCLE)}
-              style={{
-                backgroundColor:
-                  transportationMode == TransportationModes.BICYCLE
-                    ? "lightgreen"
-                    : "white",
-                margin: 10,
-                padding: 10,
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 10,
-              }}
-            >
-              <MaterialIcons name="pedal-bike" size={40} color="black" />
-            </Pressable>
-            <Pressable
-              onPress={() => setTransportationMode(TransportationModes.DRIVING)}
-              style={{
-                backgroundColor:
-                  transportationMode == TransportationModes.DRIVING
-                    ? "lightgreen"
-                    : "white",
-                margin: 10,
-                padding: 10,
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 10,
-              }}
-            >
-              <FontAwesome5 name="car" size={40} color="black" />
-            </Pressable>
+          >
+            {percentage !== 0 && (
+              <Progress.Bar
+                progress={percentage / 100}
+                width={SCREEN_WIDTH * 0.75}
+                color="#001A72"
+              />
+            )}
           </View>
         </View>
+      </View>
+      {/* TOP BACK PART */}
 
-        <Button
-          onPress={onSave}
-          title="Save"
-          style={{ margin: 10, backgroundColor: "blue" }}
-        />
-        <Text
-          onPress={onSignOutPressed}
-          style={{ textAlign: "center", color: "red", margin: 10 }}
-        >
-          Sign Out
-        </Text>
+
+      <ScrollView contentContainerStyle={{ alignItems: "center", width: '100%' }}>
+
+        <View style={{ backgroundColor: 'transparent', height: (Platform.OS === "ios" ? 150 + insets.top : 170 ), width: '25%' }}>
+          <TouchableOpacity style={{ width: "100%", height: undefined, aspectRatio: 1, marginTop: insets.top + SCREEN_HEIGHT / 15 }} onPress={pickImage} underlayColor="white">
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ ...styles.mainContainer, elevation: 10, shadowColor: '#001A72', shadowOffset: { height: -2 }, shadowOpacity: 0.3, shadowRadius: 1, height: 1.5 * SCREEN_HEIGHT, borderRadius: 12 }}>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <MaterialIcons
+                name="drive-file-rename-outline"
+                size={30}
+                color="#001A72"
+              />
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <TextInput
+                style={{
+                  flex: 1,
+                  color: "black",
+                  fontSize: 15
+                }}
+                onChangeText={setFirstName}
+                value={firstName}
+              />
+            </View>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                FIRST NAME
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <MaterialIcons
+                name="drive-file-rename-outline"
+                size={30}
+                color="#001A72"
+              />
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <TextInput
+                style={{
+                  flex: 1,
+                  color: "black",
+                  fontSize: 15
+                }}
+                onChangeText={setLastName}
+                value={lastName}
+              />
+            </View>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                LAST NAME
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <MaterialIcons name="person-pin" size={30} color="#001A72" />
+            </View>
+
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+              onPress={changeGender}
+            >
+              <Text style={{ color: "black", fontSize: 15 }}>{gender}</Text>
+            </TouchableOpacity>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                GENDER
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <Fontisto name="nursing-home" size={30} color="#001A72" />
+            </View>
+
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+              onPress={changeProf}
+            >
+              <Text style={{ color: "black", fontSize: 15 }}>{profession}</Text>
+            </TouchableOpacity>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                PROFESSION
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <MaterialCommunityIcons name="av-timer" size={30} color="#001A72" />
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{paddingRight: 15 }}>
+                  <Text style={{ fontSize: 15 }}>{experience}</Text>
+                </View>
+                <View style={{ flexDirection: 'column' }}>
+                  <TouchableOpacity
+                    style={{ borderBottomWidth: 1, borderColor:'lightgray' }}
+                    onPress={() => setExperience(experience + 1)}>
+                    <AntDesign name="up-square-o" size={21} color="#001A72" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setExperience(experience - 1)}
+                    disabled={experience==0}
+                    >
+                    <AntDesign name="down-square-o" size={21} color="#001A72" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+            </View>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                YEARS OF EXPERIENCE
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 99, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View>
+              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>WHAT LANGUAGES ARE YOU FLUENT IN?</Text>
+            </View>
+            <View style={styles.selectorContainer}>
+              <View style={{ width: '15%', alignItems: 'center', paddingLeft: '5%' }}>
+                <FontAwesome name="language" size={30} color="#001A72" />
+              </View>
+              <View style={{ width: '85%' }}>
+                <MultipleSelectList
+                  setSelected={(val) => setLanguages(val)}
+                  data={Language}
+                  save="key"
+                  placeholder={languages.length == 0 ? "Languages" : JSON.stringify(languages).replace(/['"]+/g, '').replace(/[\[\]']+/g, '')}
+                  boxStyles={{ width: '100%', borderWidth: 0, top: 5 }}
+                  dropdownStyles={styles.dropdownContainer}
+                  dropdownItemStyles={{ height: 33 }}
+                  dropdownTextStyles={{ fontSize: 12 }}
+                  search={false}
+                  label="Languages"
+                  labelStyles={{ color: 'lightgray' }}
+                  maxHeight={600}
+                  arrowicon={<AntDesign name="caretdown" size={15} color="#001A72" />}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 98, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View>
+              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>DO YOU HAVE INSURANCE COVERAGE?</Text>
+            </View>
+            <View style={styles.selectorContainer}>
+              <View style={{ width: '15%', alignItems: 'center', paddingLeft: '5%' }}>
+                <AntDesign name="Safety" size={30} color="#001A72" />
+              </View>
+              <View style={{ width: '85%' }}>
+                <SelectList
+                  setSelected={(val) => setIsinsured(val == "YES" ? true : false)}
+                  data={["YES", "NO"]}
+                  save="key"
+                  placeholder={isInsured ? "YES" : "NO"}
+                  boxStyles={{ width: '100%', borderWidth: 0 }}
+                  dropdownStyles={{ ...styles.dropdownContainer, marginTop: 9 }}
+                  dropdownItemStyles={{ height: 33 }}
+                  dropdownTextStyles={{ fontSize: 12 }}
+                  search={false}
+                  label="Do you have private insurance?"
+                  labelStyles={{ color: 'lightgray' }}
+                  maxHeight={600}
+                  arrowicon={<AntDesign name="caretdown" size={15} color="#001A72" />}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View>
+              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>HOW ARE YOU TRAVELLING?</Text>
+            </View>
+            <View style={styles.selectorContainer}>
+              <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Pressable
+                  onPress={() => setTransportationMode(TransportationModes.BICYCLE)}
+                  style={{
+                    backgroundColor:
+                      transportationMode == TransportationModes.BICYCLE
+                        ? "#001A72"
+                        : "white",
+                    margin: 10,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    borderRadius: 10,
+                    width: 63
+                  }}
+                >
+                  <MaterialIcons
+                    name="pedal-bike"
+                    size={40}
+                    color={transportationMode == TransportationModes.BICYCLE
+                      ? "white"
+                      : "#001A72"} />
+                </Pressable>
+
+                <Pressable
+                  onPress={() => setTransportationMode(TransportationModes.CAR)}
+                  style={{
+                    backgroundColor:
+                      transportationMode == TransportationModes.CAR
+                        ? "#001A72"
+                        : "white",
+                    margin: 10,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    borderRadius: 10,
+                    width: 63
+                  }}
+                >
+                  <FontAwesome5
+                    name="car"
+                    size={40}
+                    color={transportationMode == TransportationModes.CAR
+                      ? "white"
+                      : "#001A72"} />
+                </Pressable>
+
+                <Pressable
+                  onPress={() => setTransportationMode(TransportationModes.WALK)}
+                  style={{
+                    backgroundColor:
+                      transportationMode == TransportationModes.WALK
+                        ? "#001A72"
+                        : "white",
+                    margin: 10,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    borderRadius: 10,
+                    width: 63,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
+                  <FontAwesome5
+                    name="walking"
+                    size={40}
+                    color={transportationMode == TransportationModes.WALK
+                      ? "white"
+                      : "#001A72"} />
+                </Pressable>
+
+              </View>
+
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <TouchableOpacity
+                style={{ backgroundColor: '#3b5092', padding: 10, borderRadius: 10, width: '100%', height: SCREEN_HEIGHT / 15, justifyContent: 'center' }}
+                onPress={onSave}
+                underlayColor='#FFFFFF'>
+                <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>SAVE</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 export default EditUser2Screen;
 
 const styles = StyleSheet.create({
+  topstatic: {
+    position: 'absolute', width: '100%',
+    flexDirection: 'row', height: 150
+  },
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
+    fontSize: 27,
     textAlign: "center",
     margin: 10,
+    width: '100%'
   },
   input: {
     margin: 10,
     backgroundColor: "white",
     padding: 15,
     borderRadius: 5,
+  },
+  mainContainer: {
+    backgroundColor: "#FFFFFF",
+    paddingBottom: 10,
+    paddingHorizontal: "6%",
+    width: "100%",
+    alignItems: "center",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    borderColor: "lightgray",
+    paddingBottom: 0,
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    height: SCREEN_HEIGHT / 12,
+    justifyContent: "center",
+    width: "85%",
+  },
+  selectorContainer: {
+    width: '100%', flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', borderWidth: 3, borderColor: 'lightgray',
+    borderRadius: 10, minHeight: SCREEN_HEIGHT / 12
+  },
+  dropdownContainer: {
+    backgroundColor: '#F9FCFF', position: 'absolute', width: '120%',
+    top: "100%", left: '-19%', borderWidth: 3,
+    paddingHorizontal: 10, borderColor: 'lightgray', marginTop: 3
+  },
+  shadowProp: {
+    shadowColor: "#001A72",
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
 });

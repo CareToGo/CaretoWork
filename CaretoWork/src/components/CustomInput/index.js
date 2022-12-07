@@ -58,7 +58,6 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   input: {
-    fontWeight: "",
     fontSize: 15,
     justifyContent: "center",
     alignItems: "center",

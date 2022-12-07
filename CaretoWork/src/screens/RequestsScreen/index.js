@@ -8,8 +8,9 @@ import {
   Animated,
   Easing,
   SafeAreaView,
+  Platform,
 } from "react-native";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlatList } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,7 +31,7 @@ const RequestsScreen = () => {
   const [orders, setOrders] = useState([]);
   const bottomSheetRef = useRef(null);
   const { height, width } = useWindowDimensions();
-  const snapPoints = useMemo(() => [140, "85%"], []);
+  const snapPoints = useMemo(() => [1, "85%"], []);
   const { dbWorker } = useAuthContext();
   const [open, setOpen] = useState(false);
   const toggleSwitch = () => setOpen((previousState) => !previousState);
@@ -50,7 +51,7 @@ const RequestsScreen = () => {
   }, []);
   return (
     <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
-      <View style={tw`flex-row absolute top-16 left-8 z-50 p-3`}>
+      <View style={tw`flex-row absolute top-12 z-50 p-3`}>
         <TouchableOpacity
           style={tw`bg-gray-100 p-3 rounded-full shadow-lg`}
           activeOpacity={0.9}
@@ -81,31 +82,59 @@ const RequestsScreen = () => {
         )}
       </View>
 
-      <MapView
-        showsUserLocation={true}
-        followsUserLocation={true}
-        showsMyLocationButton={true}
-        style={{ height, width }}
-      >
-        {orders.map((order) => (
-          <Marker
-            key={order.id}
-            title={order.name}
-            description={order.address}
-            coordinate={{ latitude: order.lat, longitude: order.lng }}
-          >
-            <View
-              style={{
-                backgroundColor: "#001A72",
-                padding: 10,
-                borderRadius: 10,
-              }}
+      {Platform == "ios" ? (
+        <MapView
+          showsUserLocation={true}
+          followsUserLocation={true}
+          showsMyLocationButton={true}
+          style={{ height: SCREEN_HEIGHT }}
+        >
+          {orders.map((order) => (
+            <Marker
+              key={order.id}
+              title={order.name}
+              description={order.address}
+              coordinate={{ latitude: order.lat, longitude: order.lng }}
             >
-              <MaterialIcons name="medical-services" size={30} color="white" />
-            </View>
-          </Marker>
-        ))}
-      </MapView>
+              <View
+                style={{
+                  backgroundColor: "#001A72",
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
+                <MaterialIcons name="medical-services" size={30} color="white" />
+              </View>
+            </Marker>
+          ))}
+        </MapView>
+      ) : (
+        <MapView
+          showsUserLocation={true}
+          followsUserLocation={true}
+          showsMyLocationButton={true}
+          style={{ height: SCREEN_HEIGHT }}
+        >
+          {orders.map((order) => (
+            <Marker
+              key={order.id}
+              title={order.name}
+              description={order.address}
+              coordinate={{ latitude: order.lat, longitude: order.lng }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#001A72",
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
+                <MaterialIcons name="medical-services" size={30} color="white" />
+              </View>
+            </Marker>
+          ))}
+        </MapView>
+      )}
 
       <BottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
         <View
@@ -119,14 +148,14 @@ const RequestsScreen = () => {
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
-              paddingHorizontal: "7%",
+              paddingHorizontal: "3%",
             }}
           >
             <TouchableOpacity
               onPress={() => navigation.navigate("EditServicesScreen")}
-              style={tw`bg-gray-100 p-3 rounded-full shadow-lg`}
+              style={tw`bg-gray-200 p-3 rounded-full shadow-md`}
             >
-              <Ionicons name="options" size={24} color="#001A72" />
+              <Ionicons name="options" size={21} color="#001A72" />
             </TouchableOpacity>
             <Text
               style={{
@@ -140,9 +169,9 @@ const RequestsScreen = () => {
             </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("EditUser2Screen")}
-              style={tw`bg-gray-100 p-3 rounded-full shadow-lg`}
+              style={tw`bg-gray-200 p-3 rounded-full shadow-md`}
             >
-              <Ionicons name="person-outline" size={24} color="#001A72" />
+              <Ionicons name="person-outline" size={21} color="#001A72" />
             </TouchableOpacity>
           </View>
           <View style={{ alignItems: "center" }}>
@@ -155,7 +184,7 @@ const RequestsScreen = () => {
           renderItem={({ item }) => <SingleRequest order={item} />}
         />
       </BottomSheet>
-    </GestureHandlerRootView>
+    </GestureHandlerRootView >
   );
 };
 
