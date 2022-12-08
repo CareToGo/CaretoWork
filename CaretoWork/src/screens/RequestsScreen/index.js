@@ -31,7 +31,7 @@ const RequestsScreen = () => {
   const [orders, setOrders] = useState([]);
   const bottomSheetRef = useRef(null);
   const { height, width } = useWindowDimensions();
-  const snapPoints = useMemo(() => [1, "85%"], []);
+  const snapPoints = useMemo(() => ["15%", "85%"], []);
   const { dbWorker } = useAuthContext();
   const [open, setOpen] = useState(false);
   const toggleSwitch = () => setOpen((previousState) => !previousState);
