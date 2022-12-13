@@ -39,7 +39,6 @@ const EditServiceScreen = () => {
     ).subscribe((snapshot) => {
       const { items } = snapshot;
       setDbWorker(items[0]);
-      console.log(items[0]);
     });
   };
 
@@ -153,15 +152,6 @@ const EditServiceScreen = () => {
                 </TouchableOpacity>
               </View>
             )}
-            ListFooterComponent={() => (
-              <ScrollView>
-                <Button
-                  onPress={onSave}
-                  title="Save"
-                  style={{ margin: 10, backgroundColor: "blue" }}
-                />
-              </ScrollView>
-            )}
             ItemSeparatorComponent={() => (
               <View style={tw` border-t border-gray-200 flex-shrink py-0`} />
             )}
@@ -172,8 +162,9 @@ const EditServiceScreen = () => {
                   newSelected[item.id] = !newSelected[item.id];
                   setSelected(newSelected);
                 }}
-                style={tw`flex-row items-center justify-between p-5 ${selected[id] && "bg-gray-200"
-                  }`}
+                style={tw`flex-row items-center justify-between p-5 ${
+                  selected[id] && "bg-gray-200"
+                }`}
               >
                 <View style={tw`w-4/5`}>
                   <Text style={tw`font-semibold text-lg`}>{name}</Text>
@@ -211,15 +202,6 @@ const EditServiceScreen = () => {
                 </TouchableOpacity>
               </View>
             )}
-            ListFooterComponent={() => (
-              <ScrollView>
-                <Button
-                  onPress={onSave}
-                  title="Save"
-                  style={{ margin: 10, backgroundColor: "blue" }}
-                />
-              </ScrollView>
-            )}
             ItemSeparatorComponent={() => (
               <View style={tw` border-t border-gray-200 flex-shrink py-0`} />
             )}
@@ -230,8 +212,9 @@ const EditServiceScreen = () => {
                   newSelected[item.id] = !newSelected[item.id];
                   setSelected(newSelected);
                 }}
-                style={tw`flex-row items-center justify-between p-5 ${selected[id] && "bg-gray-200"
-                  }`}
+                style={tw`flex-row items-center justify-between p-5 ${
+                  selected[id] && "bg-gray-200"
+                }`}
               >
                 <View style={tw`w-4/5`}>
                   <Text style={tw`font-semibold text-lg`}>{name}</Text>
@@ -262,7 +245,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sliderContainer: {
-    width: "90%",
+    width: "100%",
     height: 50,
     borderRadius: 10,
     flexDirection: "row",

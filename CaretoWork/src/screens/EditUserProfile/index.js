@@ -10,7 +10,7 @@ import {
   ScrollView,
   Image,
   Input,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,13 +20,16 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { Fontisto } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
-import * as Location from 'expo-location';
+import { Fontisto } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
+import * as Location from "expo-location";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
+import {
+  SelectList,
+  MultipleSelectList,
+} from "react-native-dropdown-select-list";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const EditUserProfile = () => {
@@ -39,7 +42,9 @@ const EditUserProfile = () => {
   const [profession, setProfession] = useState(profession ? profession : "");
   const [experience, setExperience] = useState(experience ? experience : 0);
   const [isInsured, setIsinsured] = useState(isInsured ? isInsured : false);
-  const [transportationMode, setTransportationMode] = useState(TransportationModes.BICYCLE);
+  const [transportationMode, setTransportationMode] = useState(
+    TransportationModes.BICYCLE
+  );
   const navigation = useNavigation();
 
   const fetchsub = async () => {
@@ -74,10 +79,9 @@ const EditUserProfile = () => {
 
   useEffect(() => {
     (async () => {
-      
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
         return;
       }
 
@@ -122,6 +126,8 @@ const EditUserProfile = () => {
           isInsured,
           transportationMode,
           isVerified: false,
+          online: true,
+          maxDistance: parseInt(2),
         })
       );
       console.log(worker);
@@ -158,12 +164,16 @@ const EditUserProfile = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-
       <Text style={styles.title}>Create Your Profile</Text>
 
-      <ScrollView contentContainerStyle={{ alignItems: "center", width: '100%', borderWidth: 0 }}>
+      <ScrollView
+        contentContainerStyle={{
+          alignItems: "center",
+          width: "100%",
+          borderWidth: 0,
+        }}
+      >
         <View style={{ ...styles.mainContainer, height: 1.5 * SCREEN_HEIGHT }}>
-
           <View style={{ ...styles.inputContainer }}>
             <View style={{ justifyContent: "center", width: 30 }}>
               <MaterialIcons
@@ -186,7 +196,7 @@ const EditUserProfile = () => {
                 style={{
                   flex: 1,
                   color: "black",
-                  fontSize: 15
+                  fontSize: 15,
                 }}
                 onChangeText={setFirstName}
                 value={firstName}
@@ -230,7 +240,7 @@ const EditUserProfile = () => {
                 style={{
                   flex: 1,
                   color: "black",
-                  fontSize: 15
+                  fontSize: 15,
                 }}
                 onChangeText={setLastName}
                 value={lastName}
@@ -320,7 +330,11 @@ const EditUserProfile = () => {
 
           <View style={{ ...styles.inputContainer }}>
             <View style={{ justifyContent: "center", width: 30 }}>
-              <MaterialCommunityIcons name="av-timer" size={30} color="#001A72" />
+              <MaterialCommunityIcons
+                name="av-timer"
+                size={30}
+                color="#001A72"
+              />
             </View>
 
             <View
@@ -332,14 +346,15 @@ const EditUserProfile = () => {
                 borderBottomWidth: 1,
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <View style={{ paddingRight: 15 }}>
                   <Text style={{ fontSize: 15 }}>{experience}</Text>
                 </View>
-                <View style={{ flexDirection: 'column' }}>
+                <View style={{ flexDirection: "column" }}>
                   <TouchableOpacity
-                    style={{ borderBottomWidth: 1, borderColor: 'lightgray' }}
-                    onPress={() => setExperience(experience + 1)}>
+                    style={{ borderBottomWidth: 1, borderColor: "lightgray" }}
+                    onPress={() => setExperience(experience + 1)}
+                  >
                     <AntDesign name="up-square-o" size={21} color="#001A72" />
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -350,7 +365,6 @@ const EditUserProfile = () => {
                   </TouchableOpacity>
                 </View>
               </View>
-
             </View>
 
             <View
@@ -368,42 +382,83 @@ const EditUserProfile = () => {
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 98, marginTop: SCREEN_HEIGHT / 25 }}>
+          <View
+            style={{ width: "100%", zIndex: 98, marginTop: SCREEN_HEIGHT / 25 }}
+          >
             <View>
-              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>DO YOU HAVE INSURANCE COVERAGE?</Text>
+              <Text
+                style={{
+                  color: "lightgray",
+                  fontWeight: "bold",
+                  paddingBottom: 3,
+                  fontSize: 12,
+                }}
+              >
+                DO YOU HAVE INSURANCE COVERAGE?
+              </Text>
             </View>
             <View style={styles.selectorContainer}>
-              <View style={{ width: '15%', alignItems: 'center', paddingLeft: '5%' }}>
+              <View
+                style={{
+                  width: "15%",
+                  alignItems: "center",
+                  paddingLeft: "5%",
+                }}
+              >
                 <AntDesign name="Safety" size={30} color="#001A72" />
               </View>
-              <View style={{ width: '85%' }}>
+              <View style={{ width: "85%" }}>
                 <SelectList
-                  setSelected={(val) => setIsinsured(val == "YES" ? true : false)}
+                  setSelected={(val) =>
+                    setIsinsured(val == "YES" ? true : false)
+                  }
                   data={["YES", "NO"]}
                   save="key"
                   placeholder={isInsured ? "YES" : "NO"}
-                  boxStyles={{ width: '100%', borderWidth: 0 }}
+                  boxStyles={{ width: "100%", borderWidth: 0 }}
                   dropdownStyles={{ ...styles.dropdownContainer, marginTop: 9 }}
                   dropdownItemStyles={{ height: 33 }}
                   dropdownTextStyles={{ fontSize: 12 }}
                   search={false}
                   label="Do you have private insurance?"
-                  labelStyles={{ color: 'lightgray' }}
+                  labelStyles={{ color: "lightgray" }}
                   maxHeight={600}
-                  arrowicon={<AntDesign name="caretdown" size={15} color="#001A72" />}
+                  arrowicon={
+                    <AntDesign name="caretdown" size={15} color="#001A72" />
+                  }
                 />
               </View>
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}>
+          <View
+            style={{ width: "100%", zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}
+          >
             <View>
-              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>HOW ARE YOU TRAVELLING?</Text>
+              <Text
+                style={{
+                  color: "lightgray",
+                  fontWeight: "bold",
+                  paddingBottom: 3,
+                  fontSize: 12,
+                }}
+              >
+                HOW ARE YOU TRAVELLING?
+              </Text>
             </View>
             <View style={styles.selectorContainer}>
-              <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View
+                style={{
+                  width: "100%",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
                 <Pressable
-                  onPress={() => setTransportationMode(TransportationModes.BICYCLE)}
+                  onPress={() =>
+                    setTransportationMode(TransportationModes.BICYCLE)
+                  }
                   style={{
                     backgroundColor:
                       transportationMode == TransportationModes.BICYCLE
@@ -414,15 +469,18 @@ const EditUserProfile = () => {
                     borderWidth: 1,
                     borderColor: "gray",
                     borderRadius: 10,
-                    width: 63
+                    width: 63,
                   }}
                 >
                   <MaterialIcons
                     name="pedal-bike"
                     size={40}
-                    color={transportationMode == TransportationModes.BICYCLE
-                      ? "white"
-                      : "#001A72"} />
+                    color={
+                      transportationMode == TransportationModes.BICYCLE
+                        ? "white"
+                        : "#001A72"
+                    }
+                  />
                 </Pressable>
 
                 <Pressable
@@ -437,19 +495,24 @@ const EditUserProfile = () => {
                     borderWidth: 1,
                     borderColor: "gray",
                     borderRadius: 10,
-                    width: 63
+                    width: 63,
                   }}
                 >
                   <FontAwesome5
                     name="car"
                     size={40}
-                    color={transportationMode == TransportationModes.CAR
-                      ? "white"
-                      : "#001A72"} />
+                    color={
+                      transportationMode == TransportationModes.CAR
+                        ? "white"
+                        : "#001A72"
+                    }
+                  />
                 </Pressable>
 
                 <Pressable
-                  onPress={() => setTransportationMode(TransportationModes.WALK)}
+                  onPress={() =>
+                    setTransportationMode(TransportationModes.WALK)
+                  }
                   style={{
                     backgroundColor:
                       transportationMode == TransportationModes.WALK
@@ -461,41 +524,92 @@ const EditUserProfile = () => {
                     borderColor: "gray",
                     borderRadius: 10,
                     width: 63,
-                    justifyContent: 'center',
-                    alignItems: 'center'
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
                   <FontAwesome5
                     name="walking"
                     size={40}
-                    color={transportationMode == TransportationModes.WALK
-                      ? "white"
-                      : "#001A72"} />
+                    color={
+                      transportationMode == TransportationModes.WALK
+                        ? "white"
+                        : "#001A72"
+                    }
+                  />
                 </Pressable>
-
               </View>
-
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}>
-            <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View
+            style={{ width: "100%", zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}
+          >
+            <View
+              style={{
+                width: "100%",
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
               <TouchableOpacity
-                style={{ backgroundColor: '#3b5092', padding: 10, borderRadius: 10, width: '100%', height: SCREEN_HEIGHT / 15, justifyContent: 'center' }}
+                style={{
+                  backgroundColor: "#3b5092",
+                  padding: 10,
+                  borderRadius: 10,
+                  width: "100%",
+                  height: SCREEN_HEIGHT / 15,
+                  justifyContent: "center",
+                }}
                 onPress={onSave}
-                underlayColor='#FFFFFF'>
-                <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>CREATE</Text>
+                underlayColor="#FFFFFF"
+              >
+                <Text
+                  style={{
+                    color: "#ffde59",
+                    fontSize: 18,
+                    textAlign: "center",
+                  }}
+                >
+                  CREATE
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 96, marginTop: SCREEN_HEIGHT / 25 }}>
-            <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View
+            style={{ width: "100%", zIndex: 96, marginTop: SCREEN_HEIGHT / 25 }}
+          >
+            <View
+              style={{
+                width: "100%",
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
               <TouchableOpacity
-                style={{ backgroundColor: '#3b5092', padding: 10, borderRadius: 10, width: '100%', height: SCREEN_HEIGHT / 15, justifyContent: 'center' }}
+                style={{
+                  backgroundColor: "#3b5092",
+                  padding: 10,
+                  borderRadius: 10,
+                  width: "100%",
+                  height: SCREEN_HEIGHT / 15,
+                  justifyContent: "center",
+                }}
                 onPress={onSignOutPressed}
-                underlayColor='#FFFFFF'>
-                <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>SIGN OUT</Text>
+                underlayColor="#FFFFFF"
+              >
+                <Text
+                  style={{
+                    color: "#ffde59",
+                    fontSize: 18,
+                    textAlign: "center",
+                  }}
+                >
+                  SIGN OUT
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -538,13 +652,24 @@ const styles = StyleSheet.create({
     width: "97%",
   },
   selectorContainer: {
-    width: '100%', flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', borderWidth: 3, borderColor: 'lightgray',
-    borderRadius: 10, minHeight: SCREEN_HEIGHT / 12
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "lightgray",
+    borderRadius: 10,
+    minHeight: SCREEN_HEIGHT / 12,
   },
   dropdownContainer: {
-    backgroundColor: '#F9FCFF', position: 'absolute', width: '120%',
-    top: "100%", left: '-19%', borderWidth: 3,
-    paddingHorizontal: 10, borderColor: 'lightgray', marginTop: 3
+    backgroundColor: "#F9FCFF",
+    position: "absolute",
+    width: "120%",
+    top: "100%",
+    left: "-19%",
+    borderWidth: 3,
+    paddingHorizontal: 10,
+    borderColor: "lightgray",
+    marginTop: 3,
   },
 });

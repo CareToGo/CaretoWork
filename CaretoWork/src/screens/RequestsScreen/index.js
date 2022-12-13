@@ -10,7 +10,7 @@ import {
   SafeAreaView,
   Platform,
 } from "react-native";
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
 import BottomSheet, { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlatList } from "react-native-gesture-handler";
@@ -20,6 +20,7 @@ import MapView, { Marker } from "react-native-maps";
 import { MaterialIcons } from "@expo/vector-icons";
 import { DataStore } from "aws-amplify";
 import { Order } from "../../models";
+import { Worker } from "../../models";
 import { useAuthContext } from "../../contexts/AuthContext";
 import tw from "tailwind-react-native-classnames";
 import { useNavigation } from "@react-navigation/native";
@@ -33,11 +34,11 @@ const RequestsScreen = () => {
   const bottomSheetRef = useRef(null);
   const { height, width } = useWindowDimensions();
   const snapPoints = useMemo(() => [111, "85%"], []);
-  const { dbWorker } = useAuthContext();
-  const [open, setOpen] = useState(false);
+  const { dbWorker, setDbWorker } = useAuthContext();
+  const [online, setOnline] = useState(dbWorker?.online);
+
   const [lat, setLat] = useState(dbWorker?.lat || 0);
   const [lng, setLng] = useState(dbWorker?.lng || 0);
-  const toggleSwitch = () => setOpen((previousState) => !previousState);
   const navigation = useNavigation();
   const fetchOrders = async () => {
     const filter = await DataStore.query(Order, (order) =>
@@ -46,7 +47,6 @@ const RequestsScreen = () => {
 
     setOrders(filter);
   };
-  const [range, setRange] = useState(0);
 
   useEffect(() => {
     fetchOrders();
@@ -54,10 +54,9 @@ const RequestsScreen = () => {
 
   useEffect(() => {
     (async () => {
-
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
         return;
       }
 
@@ -67,39 +66,18 @@ const RequestsScreen = () => {
     })();
   }, []);
 
+  const updateWorkerOnline = async () => {
+    const worker = await DataStore.save(
+      Worker.copyOf(dbWorker, (updated) => {
+        updated.online = !online;
+      })
+    );
+    setOnline(!online);
+    setDbWorker(worker);
+  };
+
   return (
     <GestureHandlerRootView style={{ backgroundColor: "#FFFFFF", flex: 1 }}>
-      <View style={tw`flex-row absolute top-12 z-50 p-3`}>
-        <TouchableOpacity
-          style={tw`bg-gray-100 p-3 rounded-full shadow-lg`}
-          activeOpacity={0.9}
-          onPress={() => setOpen((state) => !state)}
-        >
-          <Ionicons name="options" size={24} color="#001A72" />
-        </TouchableOpacity>
-        {open ? (
-          <View style={tw`flex-row items-center`}>
-            <Slider
-              style={{ width: 200, height: 20 }}
-              onValueChange={(value) => setRange(value)}
-              minimumValue={1}
-              maximumValue={30}
-              value={range}
-            />
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: "bold",
-              }}
-            >
-              {Math.floor(range)}Km
-            </Text>
-          </View>
-        ) : (
-          <View></View>
-        )}
-      </View>
-
       {Platform == "ios" ? (
         <MapView
           showsUserLocation={true}
@@ -121,7 +99,11 @@ const RequestsScreen = () => {
                   borderRadius: 10,
                 }}
               >
-                <MaterialIcons name="medical-services" size={30} color="white" />
+                <MaterialIcons
+                  name="medical-services"
+                  size={30}
+                  color="white"
+                />
               </View>
             </Marker>
           ))}
@@ -147,7 +129,11 @@ const RequestsScreen = () => {
                   borderRadius: 10,
                 }}
               >
-                <MaterialIcons name="medical-services" size={30} color="white" />
+                <MaterialIcons
+                  name="medical-services"
+                  size={30}
+                  color="white"
+                />
               </View>
             </Marker>
           ))}
@@ -201,9 +187,56 @@ const RequestsScreen = () => {
           data={orders}
           renderItem={({ item }) => <SingleRequest order={item} />}
         />
-      </BottomSheet>
 
-    </GestureHandlerRootView >
+        {online ? (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#3b5092",
+              padding: 10,
+              borderRadius: 10,
+              width: "100%",
+              height: SCREEN_HEIGHT / 15,
+              justifyContent: "center",
+            }}
+            underlayColor="#FFFFFF"
+            onPress={updateWorkerOnline}
+          >
+            <Text
+              style={{
+                color: "#ffde59",
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
+              Online
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "gray",
+              padding: 10,
+              borderRadius: 10,
+              width: "100%",
+              height: SCREEN_HEIGHT / 15,
+              justifyContent: "center",
+            }}
+            underlayColor="#FFFFFF"
+            onPress={updateWorkerOnline}
+          >
+            <Text
+              style={{
+                color: "#ffde59",
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
+              Offline
+            </Text>
+          </TouchableOpacity>
+        )}
+      </BottomSheet>
+    </GestureHandlerRootView>
   );
 };
 
