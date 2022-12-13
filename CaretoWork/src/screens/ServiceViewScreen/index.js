@@ -15,11 +15,13 @@ import { useNavigation } from "@react-navigation/native";
 const ServiceViewScreen = () => {
   const [services, setServices] = useState([]);
   const { dbWorker } = useAuthContext();
+
   useEffect(() => {
     const nS = JSON.parse(dbWorker.nursingServices);
     const pS = JSON.parse(dbWorker.pswServices);
     setServices([...nS, ...pS]);
   }, []);
+
   const navigation = useNavigation();
 
   return (
@@ -31,7 +33,7 @@ const ServiceViewScreen = () => {
         onPress={() => navigation.navigate("EditServicesScreen")}
         style={{ position: "absolute", right: 0 }}
       >
-        <Feather name="edit" size={30} color="black" />
+        <Feather name="edit" size={26} color="#001A72" />
       </TouchableOpacity>
 
       <FlatList

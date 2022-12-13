@@ -6,19 +6,30 @@ import {
   View,
   Image,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import { Storage } from "aws-amplify";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const SingleRequest = ({ order }) => {
   const [services, setServices] = useState([]);
   const [homecareLocation, setHomecareLocation] = useState(null);
+  const [imageLink, setImageLink] = useState();
+
+  const fetchLink = async () => {
+    Storage.get(`${order.userID}.jpg`)
+      .then((mylink) => setImageLink(mylink))
+      .catch((e) => console.log(e));
+  };
 
   useEffect(() => {
+    fetchLink();
+    setServices(JSON.parse(order.service));
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (!status === "granted") {
@@ -51,9 +62,6 @@ const SingleRequest = ({ order }) => {
   if (!homecareLocation) {
     return <ActivityIndicator size={"large"} />;
   }
-  useEffect(() => {
-    setServices(JSON.parse(order.service));
-  }, []);
 
   const svcArray = services.map((service) => (
     <Text key={service.id} style={styles.srvcbtn}>
@@ -69,7 +77,7 @@ const SingleRequest = ({ order }) => {
     <Pressable style={styles.singlereq} onPress={pressHandler}>
       <Image
         source={{
-          uri: "https://i.ibb.co/wzDZmHt/65214598-10158632753688102-8820209946474840064-n.jpg",
+          uri: imageLink,
         }}
         style={{
           width: "35%",
@@ -79,12 +87,11 @@ const SingleRequest = ({ order }) => {
         }}
       />
       <View style={{ marginLeft: 10, marginRight: 10, flex: 1, width: "50%" }}>
-        <Text style={{ fontSize: 24, fontWeight: "600" }}>{order.name}</Text>
-        <Text style={{ color: "grey" }}>{order.address}</Text>
+        <Text style={{ fontSize: 24, fontWeight: "600" }}>{order?.name}</Text>
+        <Text style={{ color: "grey" }}>{order?.address}</Text>
         <Text style={{ marginTop: 10, fontSize: (SCREEN_WIDTH * 0.75) / 19 }}>
-          Services Requested:
+          {svcArray.length} Services Requested
         </Text>
-        {svcArray}
       </View>
       <View
         style={{
@@ -99,9 +106,9 @@ const SingleRequest = ({ order }) => {
         }}
       >
         <Entypo
-          name="check"
+          name="chevron-thin-right"
           size={30}
-          color="green"
+          color="gray"
           style={{ margin: "auto" }}
         />
       </View>
