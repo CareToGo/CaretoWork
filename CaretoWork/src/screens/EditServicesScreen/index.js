@@ -39,6 +39,7 @@ const EditServiceScreen = () => {
     ).subscribe((snapshot) => {
       const { items } = snapshot;
       setDbWorker(items[0]);
+      console.log(items[0]);
     });
   };
 

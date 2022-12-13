@@ -156,7 +156,7 @@ const RequestsScreen = () => {
             }}
           >
             <TouchableOpacity
-              onPress={() => navigation.navigate("EditServicesScreen")}
+              onPress={() => navigation.navigate("ServiceViewScreen")}
               style={tw`bg-gray-200 p-3 rounded-full shadow-md`}
             >
               <Ionicons name="options" size={21} color="#001A72" />
