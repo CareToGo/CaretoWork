@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   Platform,
 } from "react-native";
+import * as Location from 'expo-location';
 import BottomSheet, { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlatList } from "react-native-gesture-handler";
@@ -31,11 +32,12 @@ const RequestsScreen = () => {
   const [orders, setOrders] = useState([]);
   const bottomSheetRef = useRef(null);
   const { height, width } = useWindowDimensions();
-  const snapPoints = useMemo(() => ["15%", "85%"], []);
+  const snapPoints = useMemo(() => [111, "85%"], []);
   const { dbWorker } = useAuthContext();
   const [open, setOpen] = useState(false);
+  const [lat, setLat] = useState(dbWorker?.lat || 0);
+  const [lng, setLng] = useState(dbWorker?.lng || 0);
   const toggleSwitch = () => setOpen((previousState) => !previousState);
-
   const navigation = useNavigation();
   const fetchOrders = async () => {
     const filter = await DataStore.query(Order, (order) =>
@@ -49,8 +51,24 @@ const RequestsScreen = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLat(location.coords.latitude);
+      setLng(location.coords.longitude);
+    })();
+  }, []);
+
   return (
-    <GestureHandlerRootView style={{ backgroundColor: "lightblue", flex: 1 }}>
+    <GestureHandlerRootView style={{ backgroundColor: "#FFFFFF", flex: 1 }}>
       <View style={tw`flex-row absolute top-12 z-50 p-3`}>
         <TouchableOpacity
           style={tw`bg-gray-100 p-3 rounded-full shadow-lg`}
@@ -184,6 +202,7 @@ const RequestsScreen = () => {
           renderItem={({ item }) => <SingleRequest order={item} />}
         />
       </BottomSheet>
+
     </GestureHandlerRootView >
   );
 };

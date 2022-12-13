@@ -1,10 +1,4 @@
-import {
-    Text,
-    Dimensions,
-    ActivityIndicator,
-    SafeAreaView,
-    StyleSheet,
-} from "react-native";
+import { StyleSheet } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useEffect } from "react";
@@ -14,7 +8,6 @@ import AcceptScreen from "../../screens/AcceptScreen";
 import EditUser2Screen from "../../screens/EditUser2Screen"
 import EditServicesScreen from "../../screens/EditServicesScreen"
 import EditUserProfile from "../../screens/EditUserProfile";
-import { facebookSignInButton } from "aws-amplify";
 
 const Stack = createNativeStackNavigator();
 

@@ -6,10 +6,11 @@ import {
   Button,
   Alert,
   Pressable,
-  FlatList,
+  TouchableOpacity,
   ScrollView,
   Image,
   Input,
+  Dimensions
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,64 +20,28 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { PSWService } from "../../models";
-import { Storage } from "aws-amplify";
+import { Fontisto } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
-import SelectDropdown from "react-native-select-dropdown";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const EditUserProfile = () => {
   const { dbWorker, setDbWorker } = useAuthContext();
-
-  const Language = [
-    "English",
-    "French",
-    "Korean",
-    "Mandarin",
-    "Cantonese",
-    "Tagalog",
-    "Spanish",
-    "Portuguese",
-    "Italian",
-  ];
-  const Gender = ["Male", "Female", "Other"];
-  const Profession = ["RN", "RPN", "PSW"];
-
-  const [firstName, setFirstName] = useState(dbWorker?.firstName || "");
-  const [lastName, setLastName] = useState("");
-  const [info, setInfo] = useState("");
-  const [rating, setRating] = useState("");
-  const [gender, setGender] = useState("");
-  const [profession, setProfession] = useState("");
-  const [languages, setLanguages] = useState("");
-  const [experienceDescription, setExperienceDescription] = useState("");
-  const [bio, setBio] = useState("");
-  const [address, setAddress] = useState("");
-  const [transportationMode, setTransportationMode] = useState(
-    TransportationModes.BICYCLE
-  );
-  const [services, setServices] = useState([]);
-  const [sub, setSub] = useState("");
-
+  const [location, setLocation] = useState(null);
+  const [sub, setSub] = useState(sub ? sub : "");
+  const [firstName, setFirstName] = useState(firstName ? firstName : "");
+  const [lastName, setLastName] = useState(lastName ? lastName : "");
+  const [gender, setGender] = useState(gender ? gender : "");
+  const [profession, setProfession] = useState(profession ? profession : "");
+  const [experience, setExperience] = useState(experience ? experience : 0);
+  const [isInsured, setIsinsured] = useState(isInsured ? isInsured : false);
+  const [transportationMode, setTransportationMode] = useState(TransportationModes.BICYCLE);
   const navigation = useNavigation();
 
-  const [selected, setSelected] = useState({});
-  const [imageData, setImageData] = useState(null);
-  const [percentage, setPercentage] = useState(0);
-
-  const queryPSWService = async () => {
-    const subscription = DataStore.observeQuery(PSWService).subscribe(
-      (snapshot) => {
-        const { items } = snapshot;
-        setServices(items);
-        let initialSelected = {};
-        for (let item of items) {
-          initialSelected[item.id] = false;
-          setSelected(initialSelected);
-        }
-      }
-    );
-  };
   const fetchsub = async () => {
     Auth.currentAuthenticatedUser()
       .then((results) => {
@@ -86,10 +51,9 @@ const EditUserProfile = () => {
         console.log(err);
       });
   };
+
   useEffect(() => {
-    queryPSWService();
-    // fetchsub();
-    // console.log(sub);
+    fetchsub();
   }, []);
 
   useEffect(() => {
@@ -108,75 +72,19 @@ const EditUserProfile = () => {
     })();
   }, []);
 
-  const onSignOutPressed = () => {
-    try {
-      Auth.signOut();
-    } catch (e) {
-      Alert.alert("Oops", e.message);
-    }
-  };
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "Images",
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    handleImagePicked(result);
-  };
-
-  const handleImagePicked = async (pickerResult) => {
-    try {
-      if (pickerResult.cancelled) {
-        alert("Upload cancelled");
+  useEffect(() => {
+    (async () => {
+      
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
         return;
-      } else {
-        setPercentage(0);
-        const img = await fetchImageFromUri(pickerResult.uri);
-        const uploadUrl = await uploadImage(`${sub}.jpg`, img);
-        const result = await Storage.get(uploadUrl);
-        setImageData(result);
-        setImageData((state) => {
-          return state;
-        });
       }
-    } catch (e) {
-      alert("Upload failed");
-    }
-  };
 
-  const uploadImage = (filename, img) => {
-    Auth.currentCredentials();
-    return Storage.put(filename, img, {
-      level: "public",
-      contentType: "image/jpeg",
-      progressCallback(progress) {
-        setLoading(progress);
-      },
-    })
-      .then((response) => {
-        return response.key;
-      })
-      .catch((error) => {
-        console.log(error);
-        return error.response;
-      });
-  };
-
-  const setLoading = (progress) => {
-    const calculated = parseInt((progress.loaded / progress.total) * 100);
-    updatePercentage(calculated);
-  };
-
-  const updatePercentage = (number) => {
-    setPercentage(number);
-  };
-
-  const fetchImageFromUri = async (uri) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    return blob;
-  };
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
 
   const onSave = async () => {
     if (dbWorker) {
@@ -204,16 +112,15 @@ const EditUserProfile = () => {
       const worker = await DataStore.save(
         new Worker({
           sub,
-          lat: 0,
-          lng: 0,
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
           firstName,
           lastName,
-          transportationMode,
           gender,
           profession,
-          languages,
-          experienceDescription,
-          bio,
+          experience,
+          isInsured,
+          transportationMode,
           isVerified: false,
         })
       );
@@ -224,180 +131,375 @@ const EditUserProfile = () => {
     }
   };
 
+  const changeGender = () => {
+    if (gender == "Male") {
+      setGender("Female");
+    } else if (gender == "Female") {
+      setGender("Other");
+    } else if (gender == "Other" || gender == "") {
+      setGender("Male");
+    }
+  };
+
+  const changeProf = () => {
+    if (profession == "PSW" || profession == "") {
+      setProfession("RN");
+    } else if (profession == "RN") {
+      setProfession("RPN");
+    } else if (profession == "RPN") {
+      setProfession("PSW");
+    }
+  };
+
+  const onSignOutPressed = async () => {
+    await Auth.signOut();
+    setAuthUser(null);
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View
-        style={{
-          width: "100%",
-          borderWidth: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {imageData ? (
-          <Image
-            source={{
-              uri: imageData,
-            }}
-            style={{
-              width: "30%",
-              height: undefined,
-              aspectRatio: 1,
-              borderRadius: 100,
-            }}
-          />
-        ) : (
-          <Image
-            source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqXhATMW-sSeAdbYfIGpe9hNhBCo_S_T1EblnSnfKYMw&s",
-            }}
-            style={{
-              width: "30%",
-              height: undefined,
-              aspectRatio: 1,
-              borderRadius: 100,
-            }}
-          />
-        )}
-      </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
 
-      <ScrollView>
-        <View>
-          <Text style={styles.title}>Edit My Profile</Text>
-          <View style={styles.container}>
-            {percentage !== 0 && (
-              <Text style={styles.percentage}>{percentage}%</Text>
-            )}
+      <Text style={styles.title}>Create Your Profile</Text>
 
-            <Button
-              onPress={pickImage}
-              title="Pick an image from camera roll"
-            />
+      <ScrollView contentContainerStyle={{ alignItems: "center", width: '100%', borderWidth: 0 }}>
+        <View style={{ ...styles.mainContainer, height: 1.5 * SCREEN_HEIGHT }}>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <MaterialIcons
+                name="drive-file-rename-outline"
+                size={30}
+                color="#001A72"
+              />
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <TextInput
+                style={{
+                  flex: 1,
+                  color: "black",
+                  fontSize: 15
+                }}
+                onChangeText={setFirstName}
+                value={firstName}
+              />
+            </View>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                FIRST NAME
+              </Text>
+            </View>
           </View>
-          <TextInput
-            value={firstName}
-            onChangeText={setFirstName}
-            placeholder="First Name"
-            style={styles.input}
-          />
-          <TextInput
-            value={lastName}
-            onChangeText={setLastName}
-            placeholder="Last Name"
-            style={styles.input}
-          />
-          <SelectDropdown
-            data={Gender}
-            defaultButtonText="Select a Gender"
-            onSelect={(selectedItem, index) => {
-              setGender(selectedItem);
-            }}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              // text represented after item is selected
-              // if data array is an array of objects then return selectedItem.property to render after item is selected
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              // text represented for each item in dropdown
-              // if data array is an array of objects then return item.property to represent item in dropdown
-              return item;
-            }}
-          />
-          <SelectDropdown
-            data={Profession}
-            defaultButtonText="Select a Profession"
-            onSelect={(selectedItem, index) => {
-              setProfession(selectedItem);
-            }}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              // text represented after item is selected
-              // if data array is an array of objects then return selectedItem.property to render after item is selected
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              // text represented for each item in dropdown
-              // if data array is an array of objects then return item.property to represent item in dropdown
-              return item;
-            }}
-          />
 
-          <SelectDropdown
-            data={Language}
-            defaultButtonText="Select a Language"
-            onSelect={(selectedItem, index) => {
-              setLanguages(selectedItem);
-            }}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              // text represented after item is selected
-              // if data array is an array of objects then return selectedItem.property to render after item is selected
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              // text represented for each item in dropdown
-              // if data array is an array of objects then return item.property to represent item in dropdown
-              return item;
-            }}
-          />
-          <TextInput
-            value={experienceDescription}
-            onChangeText={setExperienceDescription}
-            placeholder="Experience Description"
-            style={styles.input}
-          />
-          <TextInput
-            value={bio}
-            onChangeText={setBio}
-            placeholder="Bio"
-            style={styles.input}
-          />
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <MaterialIcons
+                name="drive-file-rename-outline"
+                size={30}
+                color="#001A72"
+              />
+            </View>
 
-          <View style={{ flexDirection: "row" }}>
-            <Pressable
-              onPress={() => setTransportationMode(TransportationModes.BICYCLE)}
+            <View
               style={{
-                backgroundColor:
-                  transportationMode == TransportationModes.BICYCLE
-                    ? "lightgreen"
-                    : "white",
-                margin: 10,
-                padding: 10,
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 10,
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
               }}
             >
-              <MaterialIcons name="pedal-bike" size={40} color="black" />
-            </Pressable>
-            <Pressable
-              onPress={() => setTransportationMode(TransportationModes.CAR)}
+              <TextInput
+                style={{
+                  flex: 1,
+                  color: "black",
+                  fontSize: 15
+                }}
+                onChangeText={setLastName}
+                value={lastName}
+              />
+            </View>
+
+            <View
               style={{
-                backgroundColor:
-                  transportationMode == TransportationModes.CAR
-                    ? "lightgreen"
-                    : "white",
-                margin: 10,
-                padding: 10,
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
               }}
             >
-              <FontAwesome5 name="car" size={40} color="black" />
-            </Pressable>
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                LAST NAME
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <MaterialIcons name="person-pin" size={30} color="#001A72" />
+            </View>
+
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+              onPress={changeGender}
+            >
+              <Text style={{ color: "black", fontSize: 15 }}>{gender}</Text>
+            </TouchableOpacity>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                GENDER
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <Fontisto name="nursing-home" size={30} color="#001A72" />
+            </View>
+
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+              onPress={changeProf}
+            >
+              <Text style={{ color: "black", fontSize: 15 }}>{profession}</Text>
+            </TouchableOpacity>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                PROFESSION
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ ...styles.inputContainer }}>
+            <View style={{ justifyContent: "center", width: 30 }}>
+              <MaterialCommunityIcons name="av-timer" size={30} color="#001A72" />
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                paddingLeft: 10,
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ paddingRight: 15 }}>
+                  <Text style={{ fontSize: 15 }}>{experience}</Text>
+                </View>
+                <View style={{ flexDirection: 'column' }}>
+                  <TouchableOpacity
+                    style={{ borderBottomWidth: 1, borderColor: 'lightgray' }}
+                    onPress={() => setExperience(experience + 1)}>
+                    <AntDesign name="up-square-o" size={21} color="#001A72" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setExperience(experience - 1)}
+                    disabled={experience == 0}
+                  >
+                    <AntDesign name="down-square-o" size={21} color="#001A72" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+            </View>
+
+            <View
+              style={{
+                justifyContent: "center",
+                borderColor: "lightgray",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text
+                style={{ color: "lightgray", fontSize: 12, textAlign: "right" }}
+              >
+                YEARS OF EXPERIENCE
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 98, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View>
+              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>DO YOU HAVE INSURANCE COVERAGE?</Text>
+            </View>
+            <View style={styles.selectorContainer}>
+              <View style={{ width: '15%', alignItems: 'center', paddingLeft: '5%' }}>
+                <AntDesign name="Safety" size={30} color="#001A72" />
+              </View>
+              <View style={{ width: '85%' }}>
+                <SelectList
+                  setSelected={(val) => setIsinsured(val == "YES" ? true : false)}
+                  data={["YES", "NO"]}
+                  save="key"
+                  placeholder={isInsured ? "YES" : "NO"}
+                  boxStyles={{ width: '100%', borderWidth: 0 }}
+                  dropdownStyles={{ ...styles.dropdownContainer, marginTop: 9 }}
+                  dropdownItemStyles={{ height: 33 }}
+                  dropdownTextStyles={{ fontSize: 12 }}
+                  search={false}
+                  label="Do you have private insurance?"
+                  labelStyles={{ color: 'lightgray' }}
+                  maxHeight={600}
+                  arrowicon={<AntDesign name="caretdown" size={15} color="#001A72" />}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View>
+              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>HOW ARE YOU TRAVELLING?</Text>
+            </View>
+            <View style={styles.selectorContainer}>
+              <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Pressable
+                  onPress={() => setTransportationMode(TransportationModes.BICYCLE)}
+                  style={{
+                    backgroundColor:
+                      transportationMode == TransportationModes.BICYCLE
+                        ? "#001A72"
+                        : "white",
+                    margin: 10,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    borderRadius: 10,
+                    width: 63
+                  }}
+                >
+                  <MaterialIcons
+                    name="pedal-bike"
+                    size={40}
+                    color={transportationMode == TransportationModes.BICYCLE
+                      ? "white"
+                      : "#001A72"} />
+                </Pressable>
+
+                <Pressable
+                  onPress={() => setTransportationMode(TransportationModes.CAR)}
+                  style={{
+                    backgroundColor:
+                      transportationMode == TransportationModes.CAR
+                        ? "#001A72"
+                        : "white",
+                    margin: 10,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    borderRadius: 10,
+                    width: 63
+                  }}
+                >
+                  <FontAwesome5
+                    name="car"
+                    size={40}
+                    color={transportationMode == TransportationModes.CAR
+                      ? "white"
+                      : "#001A72"} />
+                </Pressable>
+
+                <Pressable
+                  onPress={() => setTransportationMode(TransportationModes.WALK)}
+                  style={{
+                    backgroundColor:
+                      transportationMode == TransportationModes.WALK
+                        ? "#001A72"
+                        : "white",
+                    margin: 10,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderColor: "gray",
+                    borderRadius: 10,
+                    width: 63,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
+                  <FontAwesome5
+                    name="walking"
+                    size={40}
+                    color={transportationMode == TransportationModes.WALK
+                      ? "white"
+                      : "#001A72"} />
+                </Pressable>
+
+              </View>
+
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <TouchableOpacity
+                style={{ backgroundColor: '#3b5092', padding: 10, borderRadius: 10, width: '100%', height: SCREEN_HEIGHT / 15, justifyContent: 'center' }}
+                onPress={onSave}
+                underlayColor='#FFFFFF'>
+                <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>CREATE</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 96, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <TouchableOpacity
+                style={{ backgroundColor: '#3b5092', padding: 10, borderRadius: 10, width: '100%', height: SCREEN_HEIGHT / 15, justifyContent: 'center' }}
+                onPress={onSignOutPressed}
+                underlayColor='#FFFFFF'>
+                <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>SIGN OUT</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-
-        <Button
-          onPress={onSave}
-          title="Save"
-          style={{ margin: 10, backgroundColor: "blue" }}
-        />
-        <Text
-          onPress={onSignOutPressed}
-          style={{ textAlign: "center", color: "red", margin: 10 }}
-        >
-          Sign Out
-        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -407,8 +509,8 @@ export default EditUserProfile;
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
+    fontSize: 27,
+    fontWeight: "300",
     textAlign: "center",
     margin: 10,
   },
@@ -417,5 +519,32 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 15,
     borderRadius: 5,
+  },
+  mainContainer: {
+    backgroundColor: "#FFFFFF",
+    paddingBottom: 10,
+    paddingHorizontal: "6%",
+    width: "100%",
+    alignItems: "center",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    borderColor: "lightgray",
+    paddingBottom: 0,
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    height: SCREEN_HEIGHT / 12,
+    justifyContent: "center",
+    width: "97%",
+  },
+  selectorContainer: {
+    width: '100%', flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', borderWidth: 3, borderColor: 'lightgray',
+    borderRadius: 10, minHeight: SCREEN_HEIGHT / 12
+  },
+  dropdownContainer: {
+    backgroundColor: '#F9FCFF', position: 'absolute', width: '120%',
+    top: "100%", left: '-19%', borderWidth: 3,
+    paddingHorizontal: 10, borderColor: 'lightgray', marginTop: 3
   },
 });

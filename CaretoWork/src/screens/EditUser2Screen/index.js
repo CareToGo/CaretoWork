@@ -46,7 +46,6 @@ const EditUser2Screen = () => {
   const [languages, setLanguages] = useState(dbWorker?.languages ? JSON.parse(dbWorker.languages) : []);
   const [experience, setExperience] = useState(dbWorker?.experience || 0);
   const [isInsured, setIsinsured] = useState(dbWorker?.isInsured || false);
-  const [bio, setBio] = useState("");
   const [transportationMode, setTransportationMode] = useState(
     dbWorker?.transportationMode || TransportationModes.WALK
   );
@@ -95,7 +94,6 @@ const EditUser2Screen = () => {
   }, []);
 
   const onSignOutPressed = async () => {
-    // await DataStore.clear();
     await Auth.signOut();
     setAuthUser(null);
   };
@@ -635,6 +633,17 @@ const EditUser2Screen = () => {
                 onPress={onSave}
                 underlayColor='#FFFFFF'>
                 <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>SAVE</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{ width: '100%', zIndex: 96, marginTop: SCREEN_HEIGHT / 25 }}>
+            <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <TouchableOpacity
+                style={{ backgroundColor: '#3b5092', padding: 10, borderRadius: 10, width: '100%', height: SCREEN_HEIGHT / 15, justifyContent: 'center' }}
+                onPress={onSignOutPressed}
+                underlayColor='#FFFFFF'>
+                <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>SIGN OUT</Text>
               </TouchableOpacity>
             </View>
           </View>
