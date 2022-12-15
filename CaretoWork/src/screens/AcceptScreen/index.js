@@ -36,8 +36,15 @@ const ORDER_STATUSES = {
 
 const AcceptScreen = () => {
   const [orders, setOrders] = useState([]);
-  const { order, user, acceptOrder, fetchOrder, arrivedOrder, completeOrder } =
-    useOrderContext();
+  const {
+    order,
+    user,
+    acceptOrder,
+    fetchOrder,
+    userImage,
+    arrivedOrder,
+    completeOrder,
+  } = useOrderContext();
   const navigation = useNavigation();
   const [homecareLocation, setHomecareLocation] = useState(null);
   const [totalMinutes, setTotalMinutes] = useState(0);
@@ -74,9 +81,11 @@ const AcceptScreen = () => {
   }
 
   const mapRef = useRef();
+
   const [orderStatus, setOrderStatus] = useState(
     ORDER_STATUSES.READY_FOR_PICKUP
   );
+
   const [isClose, setIsClose] = useState(false);
 
   useEffect(() => {
@@ -94,20 +103,20 @@ const AcceptScreen = () => {
         longitude: location.coords.longitude,
       });
     })();
-
-    const foregroundSubscription = Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        distanceInterval: 100,
-      },
-      (updatedLocation) => {
-        setHomecareLocation({
-          latitude: updatedLocation.coords.latitude,
-          longitude: updatedLocation.coords.longitude,
-        });
-      }
-    );
-    return foregroundSubscription;
+    console.log(data);
+    // const foregroundSubscription = Location.watchPositionAsync(
+    //   {
+    //     accuracy: Location.Accuracy.High,
+    //     distanceInterval: 100,
+    //   },
+    //   (updatedLocation) => {
+    //     setHomecareLocation({
+    //       latitude: updatedLocation.coords.latitude,
+    //       longitude: updatedLocation.coords.longitude,
+    //     });
+    //   }
+    // );
+    // return foregroundSubscription;
   }, []);
 
   if (!homecareLocation) {
@@ -138,7 +147,6 @@ const AcceptScreen = () => {
   ));
 
   const onButtonPressed = async () => {
-    console.log(order.status);
     if (order.status == "NEW") {
       bottomSheetRef.current.collapse();
       mapRef.current.animateToRegion({
@@ -268,13 +276,16 @@ const AcceptScreen = () => {
           </Text>
         </View>
         <ScrollView
-          style={{ paddingHorizontal: "3%", backgroundColor: "white" }}
+          style={{
+            paddingHorizontal: "3%",
+            backgroundColor: "white",
+          }}
         >
           <View style={styles.client}>
             <View style={styles.clientphoto}>
               <Image
                 source={{
-                  uri: "https://i.ibb.co/wzDZmHt/65214598-10158632753688102-8820209946474840064-n.jpg",
+                  uri: userImage,
                 }}
                 style={{
                   width: SCREEN_WIDTH * 0.33,
@@ -303,10 +314,7 @@ const AcceptScreen = () => {
                   marginBottom: 3,
                 }}
               >
-                <Text style={{ fontSize: 18 }}>
-                  {" "}
-                  {/* {srvc.rating.toFixed(2)} */}
-                </Text>
+                <Text style={{ fontSize: 18 }}>4.8</Text>
                 <Text style={{ marginLeft: -3, marginTop: 1 }}>
                   {" "}
                   <MaterialIcons name="star" size={21} color="#FFDE59" />{" "}
@@ -314,6 +322,7 @@ const AcceptScreen = () => {
               </View>
               <Text style={{ color: "grey" }}>{order?.address}</Text>
               <Text style={{ color: "grey" }}>{user?.contactnum}</Text>
+              <Text style={{ color: "grey" }}>{order?.time}</Text>
             </View>
           </View>
 
@@ -369,15 +378,15 @@ const AcceptScreen = () => {
             >
               {svcArray}
             </View>
-            <View style={{ width: "100%", marginTop: 20 }}>
+            {/* <View style={{ width: "100%", marginTop: 20 }}>
               <Text
                 numberOfLines={1}
                 style={{ fontWeight: "500", fontSize: 21, width: "100%" }}
               >
                 Client Message:{" "}
               </Text>
-            </View>
-            <View
+            </View> */}
+            {/* <View
               style={{
                 width: "100%",
                 marginTop: 2,
@@ -388,14 +397,15 @@ const AcceptScreen = () => {
               }}
             >
               <Text style={{ fontSize: 15, color: "grey" }}>
-                {/* {srvc.description} */}
+                {srvc.description}
               </Text>
-            </View>
+            </View> */}
           </View>
 
           <Pressable
             style={{
-              marginTop: 20,
+              marginBottom: 0,
+              marginTop: 200,
               backgroundColor: isButtonDisabled() ? "grey" : "#3FC060",
               width: "100%",
               height: 60,
@@ -428,9 +438,9 @@ const AcceptScreen = () => {
             </Text>
           </Pressable>
 
-          <View style={{ height: 50 }}>
+          {/* <View style={{ height: 50 }}>
             <Text> </Text>
-          </View>
+          </View> */}
         </ScrollView>
       </BottomSheet>
     </GestureHandlerRootView>
@@ -468,17 +478,12 @@ const styles = StyleSheet.create({
     borderRightColor: "lightgrey",
   },
   srvcbtnsmall: {
-    color: "#FFDE59",
-    backgroundColor: "#001A72",
-    borderRadius: 6,
-    padding: 6,
+    color: "black",
     textAlign: "center",
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 5,
-    marginHorizontal: 5,
     width: "45%",
-    height: "45%",
     overflow: "hidden",
     fontSize: (SCREEN_WIDTH * 0.7) / 20,
   },

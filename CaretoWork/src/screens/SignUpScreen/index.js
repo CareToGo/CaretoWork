@@ -1,9 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Alert,
-} from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import React, { useState } from "react";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
@@ -13,8 +8,10 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { Auth } from "aws-amplify";
 
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const EMAIL_REGEX =
+  /^(?!.*(?:\.-|-\.))[^@]+@[^\W_](?:[\w-]*[^\W_])?(?:\.[^\W_](?:[\w-]*[^\W_])?)+$/;
 const PHONE_REGEX = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
 const SignUpScreen = () => {
@@ -145,7 +142,7 @@ const styles = StyleSheet.create({
     maxWidth: 300,
   },
   text: {
-    color: "gray",
+    color: "black",
     marginVertical: 10,
   },
   link: {

@@ -23,7 +23,39 @@ const ServiceViewScreen = () => {
   }, []);
 
   const navigation = useNavigation();
-
+  const Split = () => {
+    console.log(services.length == 0);
+    if (services.length == 0) {
+      return (
+        <View>
+          <Text>You don't have any Services Selected</Text>
+        </View>
+      );
+    }
+    if (services.length > 0) {
+      return (
+        <FlatList
+          data={services}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponentStyle={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          ItemSeparatorComponent={() => (
+            <View style={tw` border-t border-gray-200 flex-shrink py-0`} />
+          )}
+          renderItem={({ item: { id, name, description, price }, item }) => (
+            <View style={tw`flex-row items-center justify-between p-5`}>
+              <View style={tw`w-4/5`}>
+                <Text style={tw`font-semibold text-lg`}>{name}</Text>
+                <Text style={tw`text-gray-500`}>{description}</Text>
+              </View>
+            </View>
+          )}
+        />
+      );
+    }
+  };
   return (
     <SafeAreaView>
       <View style={tw`flex-row p-2`}>
@@ -35,31 +67,10 @@ const ServiceViewScreen = () => {
       >
         <Feather name="edit" size={26} color="#001A72" />
       </TouchableOpacity>
-
-      <FlatList
-        data={services}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponentStyle={{
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        ItemSeparatorComponent={() => (
-          <View style={tw` border-t border-gray-200 flex-shrink py-0`} />
-        )}
-        renderItem={({ item: { id, name, description, price }, item }) => (
-          <View style={tw`flex-row items-center justify-between p-5`}>
-            <View style={tw`w-4/5`}>
-              <Text style={tw`font-semibold text-lg`}>{name}</Text>
-              <Text style={tw`text-gray-500`}>{description}</Text>
-            </View>
-          </View>
-        )}
-      />
+      <Split />
     </SafeAreaView>
   );
 };
-
-export default ServiceViewScreen;
 
 const styles = StyleSheet.create({
   title: {
@@ -69,3 +80,5 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 });
+
+export default ServiceViewScreen;

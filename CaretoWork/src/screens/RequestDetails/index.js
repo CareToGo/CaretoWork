@@ -241,9 +241,6 @@ const RequestDetails = () => {
             </Text>
           </Pressable>
           <Button onPress={Auth.signOut()}>Signout</Button>
-          <View style={{ height: 50 }}>
-            <Text> </Text>
-          </View>
         </ScrollView>
       </View>
     </GestureHandlerRootView>

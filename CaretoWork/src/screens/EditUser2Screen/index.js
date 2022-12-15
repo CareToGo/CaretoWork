@@ -11,39 +11,44 @@ import {
   ScrollView,
   Image,
   Input,
-  Dimensions
+  Dimensions,
 } from "react-native";
-import { SelectList, MultipleSelectList } from 'react-native-dropdown-select-list'
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SelectList,
+  MultipleSelectList,
+} from "react-native-dropdown-select-list";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Auth, DataStore } from "aws-amplify";
 import { TransportationModes, Worker } from "../../models";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Progress from "react-native-progress";
 import { Storage } from "aws-amplify";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
-import pro1 from "../../../assets/maleprovider.png"
-import pro2 from "../../../assets/femaleprovider.png"
-import { Fontisto } from '@expo/vector-icons';
+import pro1 from "../../../assets/maleprovider.png";
+import pro2 from "../../../assets/femaleprovider.png";
+import { Fontisto } from "@expo/vector-icons";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const EditUser2Screen = () => {
   const insets = useSafeAreaInsets();
   const { dbWorker, sub, setDbWorker, setAuthUser } = useAuthContext();
-  const [imageLink, setImageLink] = useState(imageLink? imageLink : null);
+  const [imageLink, setImageLink] = useState(imageLink ? imageLink : null);
   const [firstName, setFirstName] = useState(dbWorker?.firstName || "");
   const [lastName, setLastName] = useState(dbWorker?.lastName || "");
   const [gender, setGender] = useState(dbWorker?.gender || "");
   const [profession, setProfession] = useState(dbWorker?.profession || "");
-  const [languages, setLanguages] = useState(dbWorker?.languages ? JSON.parse(dbWorker.languages) : []);
+  const [languages, setLanguages] = useState(
+    dbWorker?.languages ? JSON.parse(dbWorker.languages) : []
+  );
   const [experience, setExperience] = useState(dbWorker?.experience || 0);
   const [isInsured, setIsinsured] = useState(dbWorker?.isInsured || false);
   const [transportationMode, setTransportationMode] = useState(
@@ -64,7 +69,7 @@ const EditUser2Screen = () => {
   ];
 
   useEffect(() => {
-    console.log('image',imageLink)
+    console.log("image", imageLink);
   }, []);
 
   useEffect(() => {
@@ -103,7 +108,7 @@ const EditUser2Screen = () => {
       allowsEditing: true,
       mediaTypes: "Images",
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.3,
     });
     handleImagePicked(result);
   };
@@ -208,47 +213,74 @@ const EditUser2Screen = () => {
   };
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', paddingTop: (Platform.OS === "ios" ? 0 : insets.top ) }}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        paddingTop: Platform.OS === "ios" ? 0 : insets.top,
+      }}
+    >
       {/* TOP BACK PART */}
-      <View style={{ ...styles.topstatic, top: (Platform.OS === "ios" ? insets.top - 10 : insets.top + 10) }}>
+      <View
+        style={{
+          ...styles.topstatic,
+          top: Platform.OS === "ios" ? insets.top - 10 : insets.top + 10,
+        }}
+      >
         <Image
           source={pro1}
           style={{
             height: SCREEN_HEIGHT / 6,
-            resizeMode: 'contain',
-            position: 'absolute',
+            resizeMode: "contain",
+            position: "absolute",
             left: -30,
             bottom: -10,
-            opacity: 0.6
+            opacity: 0.6,
           }}
         />
         <Image
           source={pro2}
           style={{
             height: SCREEN_HEIGHT / 6,
-            resizeMode: 'contain',
-            position: 'absolute',
+            resizeMode: "contain",
+            position: "absolute",
             right: -30,
             bottom: -10,
-            opacity: 0.6
+            opacity: 0.6,
           }}
         />
-        <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <Text style={styles.title}>Edit My Profile</Text>
-          <View style={{ width: "100%", justifyContent: "center", flexDirection: "row" }} >
-            <TouchableOpacity style={{ width: "25%" }} onPress={pickImage} underlayColor="lightgray" >
+          <View
+            style={{
+              width: "100%",
+              justifyContent: "center",
+              flexDirection: "row",
+            }}
+          >
+            <TouchableOpacity
+              style={{ width: "25%" }}
+              onPress={pickImage}
+              underlayColor="lightgray"
+            >
               <Image
                 source={{
-                  uri: (!imageLink ?
-                    ("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqXhATMW-sSeAdbYfIGpe9hNhBCo_S_T1EblnSnfKYMw&s") :
-                    (imageLink))
+                  uri: !imageLink
+                    ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqXhATMW-sSeAdbYfIGpe9hNhBCo_S_T1EblnSnfKYMw&s"
+                    : imageLink,
                 }}
                 style={{
                   width: "100%",
                   height: undefined,
                   aspectRatio: 1,
                   borderRadius: 100,
-                  backgroundColor:'lightgray'
+                  backgroundColor: "lightgray",
                 }}
               />
             </TouchableOpacity>
@@ -274,16 +306,40 @@ const EditUser2Screen = () => {
       </View>
       {/* TOP BACK PART */}
 
-
-      <ScrollView contentContainerStyle={{ alignItems: "center", width: '100%' }}>
-
-        <View style={{ backgroundColor: 'transparent', height: (Platform.OS === "ios" ? 150 + insets.top : 170 ), width: '25%' }}>
-          <TouchableOpacity style={{ width: "100%", height: undefined, aspectRatio: 1, marginTop: insets.top + SCREEN_HEIGHT / 15 }} onPress={pickImage} underlayColor="white">
-          </TouchableOpacity>
+      <ScrollView
+        contentContainerStyle={{ alignItems: "center", width: "100%" }}
+      >
+        <View
+          style={{
+            backgroundColor: "transparent",
+            height: Platform.OS === "ios" ? 150 + insets.top : 170,
+            width: "25%",
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              width: "100%",
+              height: undefined,
+              aspectRatio: 1,
+              marginTop: insets.top + SCREEN_HEIGHT / 15,
+            }}
+            onPress={pickImage}
+            underlayColor="white"
+          ></TouchableOpacity>
         </View>
 
-        <View style={{ ...styles.mainContainer, elevation: 10, shadowColor: '#001A72', shadowOffset: { height: -2 }, shadowOpacity: 0.3, shadowRadius: 1, height: 1.5 * SCREEN_HEIGHT, borderRadius: 12 }}>
-
+        <View
+          style={{
+            ...styles.mainContainer,
+            elevation: 10,
+            shadowColor: "#001A72",
+            shadowOffset: { height: -2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 1,
+            height: 1.5 * SCREEN_HEIGHT,
+            borderRadius: 12,
+          }}
+        >
           <View style={{ ...styles.inputContainer }}>
             <View style={{ justifyContent: "center", width: 30 }}>
               <MaterialIcons
@@ -306,7 +362,7 @@ const EditUser2Screen = () => {
                 style={{
                   flex: 1,
                   color: "black",
-                  fontSize: 15
+                  fontSize: 15,
                 }}
                 onChangeText={setFirstName}
                 value={firstName}
@@ -350,7 +406,7 @@ const EditUser2Screen = () => {
                 style={{
                   flex: 1,
                   color: "black",
-                  fontSize: 15
+                  fontSize: 15,
                 }}
                 onChangeText={setLastName}
                 value={lastName}
@@ -440,7 +496,11 @@ const EditUser2Screen = () => {
 
           <View style={{ ...styles.inputContainer }}>
             <View style={{ justifyContent: "center", width: 30 }}>
-              <MaterialCommunityIcons name="av-timer" size={30} color="#001A72" />
+              <MaterialCommunityIcons
+                name="av-timer"
+                size={30}
+                color="#001A72"
+              />
             </View>
 
             <View
@@ -452,25 +512,25 @@ const EditUser2Screen = () => {
                 borderBottomWidth: 1,
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{paddingRight: 15 }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={{ paddingRight: 15 }}>
                   <Text style={{ fontSize: 15 }}>{experience}</Text>
                 </View>
-                <View style={{ flexDirection: 'column' }}>
+                <View style={{ flexDirection: "column" }}>
                   <TouchableOpacity
-                    style={{ borderBottomWidth: 1, borderColor:'lightgray' }}
-                    onPress={() => setExperience(experience + 1)}>
+                    style={{ borderBottomWidth: 1, borderColor: "lightgray" }}
+                    onPress={() => setExperience(experience + 1)}
+                  >
                     <AntDesign name="up-square-o" size={21} color="#001A72" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setExperience(experience - 1)}
-                    disabled={experience==0}
-                    >
+                    disabled={experience == 0}
+                  >
                     <AntDesign name="down-square-o" size={21} color="#001A72" />
                   </TouchableOpacity>
                 </View>
               </View>
-
             </View>
 
             <View
@@ -488,70 +548,136 @@ const EditUser2Screen = () => {
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 99, marginTop: SCREEN_HEIGHT / 25 }}>
+          <View
+            style={{ width: "100%", zIndex: 99, marginTop: SCREEN_HEIGHT / 25 }}
+          >
             <View>
-              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>WHAT LANGUAGES ARE YOU FLUENT IN?</Text>
+              <Text
+                style={{
+                  color: "lightgray",
+                  fontWeight: "bold",
+                  paddingBottom: 3,
+                  fontSize: 12,
+                }}
+              >
+                WHAT LANGUAGES ARE YOU FLUENT IN?
+              </Text>
             </View>
             <View style={styles.selectorContainer}>
-              <View style={{ width: '15%', alignItems: 'center', paddingLeft: '5%' }}>
+              <View
+                style={{
+                  width: "15%",
+                  alignItems: "center",
+                  paddingLeft: "5%",
+                }}
+              >
                 <FontAwesome name="language" size={30} color="#001A72" />
               </View>
-              <View style={{ width: '85%' }}>
+              <View style={{ width: "85%" }}>
                 <MultipleSelectList
                   setSelected={(val) => setLanguages(val)}
                   data={Language}
                   save="key"
-                  placeholder={languages.length == 0 ? "Languages" : JSON.stringify(languages).replace(/['"]+/g, '').replace(/[\[\]']+/g, '')}
-                  boxStyles={{ width: '100%', borderWidth: 0, top: 5 }}
+                  placeholder={
+                    languages.length == 0
+                      ? "Languages"
+                      : JSON.stringify(languages)
+                          .replace(/['"]+/g, "")
+                          .replace(/[\[\]']+/g, "")
+                  }
+                  boxStyles={{ width: "100%", borderWidth: 0, top: 5 }}
                   dropdownStyles={styles.dropdownContainer}
                   dropdownItemStyles={{ height: 33 }}
                   dropdownTextStyles={{ fontSize: 12 }}
                   search={false}
                   label="Languages"
-                  labelStyles={{ color: 'lightgray' }}
+                  labelStyles={{ color: "lightgray" }}
                   maxHeight={600}
-                  arrowicon={<AntDesign name="caretdown" size={15} color="#001A72" />}
+                  arrowicon={
+                    <AntDesign name="caretdown" size={15} color="#001A72" />
+                  }
                 />
               </View>
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 98, marginTop: SCREEN_HEIGHT / 25 }}>
+          <View
+            style={{ width: "100%", zIndex: 98, marginTop: SCREEN_HEIGHT / 25 }}
+          >
             <View>
-              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>DO YOU HAVE INSURANCE COVERAGE?</Text>
+              <Text
+                style={{
+                  color: "lightgray",
+                  fontWeight: "bold",
+                  paddingBottom: 3,
+                  fontSize: 12,
+                }}
+              >
+                DO YOU HAVE INSURANCE COVERAGE?
+              </Text>
             </View>
             <View style={styles.selectorContainer}>
-              <View style={{ width: '15%', alignItems: 'center', paddingLeft: '5%' }}>
+              <View
+                style={{
+                  width: "15%",
+                  alignItems: "center",
+                  paddingLeft: "5%",
+                }}
+              >
                 <AntDesign name="Safety" size={30} color="#001A72" />
               </View>
-              <View style={{ width: '85%' }}>
+              <View style={{ width: "85%" }}>
                 <SelectList
-                  setSelected={(val) => setIsinsured(val == "YES" ? true : false)}
+                  setSelected={(val) =>
+                    setIsinsured(val == "YES" ? true : false)
+                  }
                   data={["YES", "NO"]}
                   save="key"
                   placeholder={isInsured ? "YES" : "NO"}
-                  boxStyles={{ width: '100%', borderWidth: 0 }}
+                  boxStyles={{ width: "100%", borderWidth: 0 }}
                   dropdownStyles={{ ...styles.dropdownContainer, marginTop: 9 }}
                   dropdownItemStyles={{ height: 33 }}
                   dropdownTextStyles={{ fontSize: 12 }}
                   search={false}
                   label="Do you have private insurance?"
-                  labelStyles={{ color: 'lightgray' }}
+                  labelStyles={{ color: "lightgray" }}
                   maxHeight={600}
-                  arrowicon={<AntDesign name="caretdown" size={15} color="#001A72" />}
+                  arrowicon={
+                    <AntDesign name="caretdown" size={15} color="#001A72" />
+                  }
                 />
               </View>
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}>
+          <View
+            style={{ width: "100%", zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}
+          >
             <View>
-              <Text style={{ color: 'lightgray', fontWeight: 'bold', paddingBottom: 3, fontSize: 12 }}>HOW ARE YOU TRAVELLING?</Text>
+              <Text
+                style={{
+                  color: "lightgray",
+                  fontWeight: "bold",
+                  paddingBottom: 3,
+                  fontSize: 12,
+                }}
+              >
+                HOW ARE YOU TRAVELLING?
+              </Text>
             </View>
             <View style={styles.selectorContainer}>
-              <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View
+                style={{
+                  width: "100%",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
                 <Pressable
-                  onPress={() => setTransportationMode(TransportationModes.BICYCLE)}
+                  onPress={() =>
+                    setTransportationMode(TransportationModes.BICYCLE)
+                  }
                   style={{
                     backgroundColor:
                       transportationMode == TransportationModes.BICYCLE
@@ -562,15 +688,18 @@ const EditUser2Screen = () => {
                     borderWidth: 1,
                     borderColor: "gray",
                     borderRadius: 10,
-                    width: 63
+                    width: 63,
                   }}
                 >
                   <MaterialIcons
                     name="pedal-bike"
                     size={40}
-                    color={transportationMode == TransportationModes.BICYCLE
-                      ? "white"
-                      : "#001A72"} />
+                    color={
+                      transportationMode == TransportationModes.BICYCLE
+                        ? "white"
+                        : "#001A72"
+                    }
+                  />
                 </Pressable>
 
                 <Pressable
@@ -585,19 +714,24 @@ const EditUser2Screen = () => {
                     borderWidth: 1,
                     borderColor: "gray",
                     borderRadius: 10,
-                    width: 63
+                    width: 63,
                   }}
                 >
                   <FontAwesome5
                     name="car"
                     size={40}
-                    color={transportationMode == TransportationModes.CAR
-                      ? "white"
-                      : "#001A72"} />
+                    color={
+                      transportationMode == TransportationModes.CAR
+                        ? "white"
+                        : "#001A72"
+                    }
+                  />
                 </Pressable>
 
                 <Pressable
-                  onPress={() => setTransportationMode(TransportationModes.WALK)}
+                  onPress={() =>
+                    setTransportationMode(TransportationModes.WALK)
+                  }
                   style={{
                     backgroundColor:
                       transportationMode == TransportationModes.WALK
@@ -609,45 +743,95 @@ const EditUser2Screen = () => {
                     borderColor: "gray",
                     borderRadius: 10,
                     width: 63,
-                    justifyContent: 'center',
-                    alignItems: 'center'
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
                   <FontAwesome5
                     name="walking"
                     size={40}
-                    color={transportationMode == TransportationModes.WALK
-                      ? "white"
-                      : "#001A72"} />
+                    color={
+                      transportationMode == TransportationModes.WALK
+                        ? "white"
+                        : "#001A72"
+                    }
+                  />
                 </Pressable>
-
               </View>
-
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}>
-            <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View
+            style={{ width: "100%", zIndex: 97, marginTop: SCREEN_HEIGHT / 25 }}
+          >
+            <View
+              style={{
+                width: "100%",
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
               <TouchableOpacity
-                style={{ backgroundColor: '#3b5092', padding: 10, borderRadius: 10, width: '100%', height: SCREEN_HEIGHT / 15, justifyContent: 'center' }}
+                style={{
+                  backgroundColor: "#3b5092",
+                  padding: 10,
+                  borderRadius: 10,
+                  width: "100%",
+                  height: SCREEN_HEIGHT / 15,
+                  justifyContent: "center",
+                }}
                 onPress={onSave}
-                underlayColor='#FFFFFF'>
-                <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>SAVE</Text>
+                underlayColor="#FFFFFF"
+              >
+                <Text
+                  style={{
+                    color: "#ffde59",
+                    fontSize: 18,
+                    textAlign: "center",
+                  }}
+                >
+                  SAVE
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={{ width: '100%', zIndex: 96, marginTop: SCREEN_HEIGHT / 25 }}>
-            <View style={{ width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View
+            style={{ width: "100%", zIndex: 96, marginTop: SCREEN_HEIGHT / 25 }}
+          >
+            <View
+              style={{
+                width: "100%",
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
               <TouchableOpacity
-                style={{ backgroundColor: '#3b5092', padding: 10, borderRadius: 10, width: '100%', height: SCREEN_HEIGHT / 15, justifyContent: 'center' }}
+                style={{
+                  backgroundColor: "#3b5092",
+                  padding: 10,
+                  borderRadius: 10,
+                  width: "100%",
+                  height: SCREEN_HEIGHT / 15,
+                  justifyContent: "center",
+                }}
                 onPress={onSignOutPressed}
-                underlayColor='#FFFFFF'>
-                <Text style={{ color: '#ffde59', fontSize: 18, textAlign: 'center' }}>SIGN OUT</Text>
+                underlayColor="#FFFFFF"
+              >
+                <Text
+                  style={{
+                    color: "#ffde59",
+                    fontSize: 18,
+                    textAlign: "center",
+                  }}
+                >
+                  SIGN OUT
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
-
         </View>
       </ScrollView>
     </View>
@@ -658,14 +842,16 @@ export default EditUser2Screen;
 
 const styles = StyleSheet.create({
   topstatic: {
-    position: 'absolute', width: '100%',
-    flexDirection: 'row', height: 150
+    position: "absolute",
+    width: "100%",
+    flexDirection: "row",
+    height: 150,
   },
   title: {
     fontSize: 27,
     textAlign: "center",
     margin: 10,
-    width: '100%'
+    width: "100%",
   },
   input: {
     margin: 10,
@@ -691,14 +877,25 @@ const styles = StyleSheet.create({
     width: "85%",
   },
   selectorContainer: {
-    width: '100%', flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', borderWidth: 3, borderColor: 'lightgray',
-    borderRadius: 10, minHeight: SCREEN_HEIGHT / 12
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "lightgray",
+    borderRadius: 10,
+    minHeight: SCREEN_HEIGHT / 12,
   },
   dropdownContainer: {
-    backgroundColor: '#F9FCFF', position: 'absolute', width: '120%',
-    top: "100%", left: '-19%', borderWidth: 3,
-    paddingHorizontal: 10, borderColor: 'lightgray', marginTop: 3
+    backgroundColor: "#F9FCFF",
+    position: "absolute",
+    width: "120%",
+    top: "100%",
+    left: "-19%",
+    borderWidth: 3,
+    paddingHorizontal: 10,
+    borderColor: "lightgray",
+    marginTop: 3,
   },
   shadowProp: {
     shadowColor: "#001A72",

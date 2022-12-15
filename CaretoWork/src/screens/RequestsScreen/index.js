@@ -41,11 +41,12 @@ const RequestsScreen = () => {
   const [lng, setLng] = useState(dbWorker?.lng || 0);
   const navigation = useNavigation();
   const fetchOrders = async () => {
-    const filter = await DataStore.query(Order, (order) =>
+    const subscription = DataStore.observeQuery(Order, (order) =>
       order.orderWorkerId("eq", dbWorker.id)
-    );
-
-    setOrders(filter);
+    ).subscribe((snapshot) => {
+      const { items } = snapshot;
+      setOrders(items);
+    });
   };
 
   useEffect(() => {

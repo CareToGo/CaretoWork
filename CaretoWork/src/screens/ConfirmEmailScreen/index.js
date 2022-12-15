@@ -1,9 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Alert,
-} from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import React, { useState } from "react";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
@@ -14,7 +9,8 @@ import { useForm } from "react-hook-form";
 import { useRoute } from "@react-navigation/native";
 import { Auth } from "aws-amplify";
 
-const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const EMAIL_REGEX =
+  /^(?!.*(?:\.-|-\.))[^@]+@[^\W_](?:[\w-]*[^\W_])?(?:\.[^\W_](?:[\w-]*[^\W_])?)+$/;
 const ConfirmEmailScreen = () => {
   const route = useRoute();
   const { control, handleSubmit, watch } = useForm({
@@ -44,7 +40,7 @@ const ConfirmEmailScreen = () => {
   const onSignInPressed = () => {
     navigation.navigate("SignIn");
   };
-  
+
   return (
     <SafeAreaView>
       <ScrollView>

@@ -12,17 +12,27 @@ import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import { Storage } from "aws-amplify";
-
+import { Storage, DataStore } from "aws-amplify";
+import { User } from "../../models";
+import { useOrderContext } from "../../contexts/OrderContext";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const SingleRequest = ({ order }) => {
+  const {
+    user,
+    acceptOrder,
+    fetchOrder,
+    userImage,
+    arrivedOrder,
+    completeOrder,
+  } = useOrderContext();
   const [services, setServices] = useState([]);
   const [homecareLocation, setHomecareLocation] = useState(null);
   const [imageLink, setImageLink] = useState();
 
   const fetchLink = async () => {
-    Storage.get(`${order.userID}.jpg`)
+    const user = await DataStore.query(User, order.userID);
+    Storage.get(`${user.sub}.jpg`)
       .then((mylink) => setImageLink(mylink))
       .catch((e) => console.log(e));
   };
@@ -30,38 +40,38 @@ const SingleRequest = ({ order }) => {
   useEffect(() => {
     fetchLink();
     setServices(JSON.parse(order.service));
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (!status === "granted") {
-        console.log("Nonono");
-        return;
-      }
+    // (async () => {
+    //   let { status } = await Location.requestForegroundPermissionsAsync();
+    //   if (!status === "granted") {
+    //     console.log("Nonono");
+    //     return;
+    //   }
 
-      let location = await Location.getCurrentPositionAsync();
-      setHomecareLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    })();
+    //   let location = await Location.getCurrentPositionAsync();
+    //   setHomecareLocation({
+    //     latitude: location.coords.latitude,
+    //     longitude: location.coords.longitude,
+    //   });
+    // })();
 
-    const foregroundSubscription = Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        distanceInterval: 100,
-      },
-      (updatedLocation) => {
-        setHomecareLocation({
-          latitude: updatedLocation.coords.latitude,
-          longitude: updatedLocation.coords.longitude,
-        });
-      }
-    );
-    return foregroundSubscription;
+    // const foregroundSubscription = Location.watchPositionAsync(
+    //   {
+    //     accuracy: Location.Accuracy.High,
+    //     distanceInterval: 100,
+    //   },
+    //   (updatedLocation) => {
+    //     setHomecareLocation({
+    //       latitude: updatedLocation.coords.latitude,
+    //       longitude: updatedLocation.coords.longitude,
+    //     });
+    //   }
+    // );
+    // return foregroundSubscription;
   }, []);
 
-  if (!homecareLocation) {
-    return <ActivityIndicator size={"large"} />;
-  }
+  // if (!homecareLocation) {
+  //   return <ActivityIndicator size={"large"} />;
+  // }
 
   const svcArray = services.map((service) => (
     <Text key={service.id} style={styles.srvcbtn}>
@@ -89,6 +99,8 @@ const SingleRequest = ({ order }) => {
       <View style={{ marginLeft: 10, marginRight: 10, flex: 1, width: "50%" }}>
         <Text style={{ fontSize: 24, fontWeight: "600" }}>{order?.name}</Text>
         <Text style={{ color: "grey" }}>{order?.address}</Text>
+        <Text style={{ color: "grey" }}>{order?.time}</Text>
+        <Text style={{ color: "black" }}>ORDER {order?.status}</Text>
         <Text style={{ marginTop: 10, fontSize: (SCREEN_WIDTH * 0.75) / 19 }}>
           {svcArray.length} Services Requested
         </Text>

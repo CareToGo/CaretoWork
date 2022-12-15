@@ -128,9 +128,10 @@ const EditUserProfile = () => {
           isVerified: false,
           online: true,
           maxDistance: parseInt(2),
+          pswServices: "[]",
+          nursingServices: "[]",
         })
       );
-      console.log(worker);
       setDbWorker(worker);
     } catch (e) {
       Alert.alert("Error", e.message);

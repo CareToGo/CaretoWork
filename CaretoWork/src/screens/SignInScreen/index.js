@@ -12,11 +12,14 @@ import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
-import { Auth } from "aws-amplify";
+import { Auth, Hub } from "aws-amplify";
+import { DataStore } from "aws-amplify";
 import { useAuthContext } from "../../contexts/AuthContext";
 
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const EMAIL_REGEX =
+  /^(?!.*(?:\.-|-\.))[^@]+@[^\W_](?:[\w-]*[^\W_])?(?:\.[^\W_](?:[\w-]*[^\W_])?)+$/;
 const PHONE_REGEX = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -24,8 +27,12 @@ const SignInScreen = () => {
   const { authUser, setAuthUser } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-  const { control, handleSubmit, formState: { errors } } = useForm();
-  
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
   const onSignInPressed = async (data) => {
     if (loading) {
       return;
@@ -33,12 +40,18 @@ const SignInScreen = () => {
     setLoading(true);
     try {
       const auth = await Auth.signIn(data.email, data.password);
-      setAuthUser(auth)
+      await DataStore.clear();
+      setAuthUser(auth);
     } catch (e) {
       Alert.alert("Oops", e.message);
     }
     setLoading(false);
   };
+  Hub.listen("auth", async (data) => {
+    if (data.payload.event === "signIn") {
+      await DataStore.clear();
+    }
+  });
 
   const onForgotPasswordPressed = () => {
     navigation.navigate("ForgotPassword");
@@ -52,11 +65,7 @@ const SignInScreen = () => {
     <SafeAreaView>
       <View>
         <View style={styles.root}>
-          <Image
-            source={Logo}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <Image source={Logo} style={styles.logo} resizeMode="contain" />
           <CustomInput
             name="email"
             placeholder="Email"
@@ -113,13 +122,13 @@ export default SignInScreen;
 const styles = StyleSheet.create({
   root: {
     alignItems: "center",
-    padding: '6%',
+    padding: "6%",
     backgroundColor: "F9FBFC",
   },
   logo: {
     width: "70%",
     maxHeight: 200,
     maxWidth: 300,
-    marginTop: '21%'
+    marginTop: "21%",
   },
 });

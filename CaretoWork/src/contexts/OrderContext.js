@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { Auth, DataStore } from "aws-amplify";
+import { Storage, DataStore } from "aws-amplify";
 import { Worker, User, Order } from "../models";
 import { useAuthContext } from "./AuthContext";
 
@@ -10,6 +10,7 @@ const OrderContextProvider = ({ children }) => {
   const [orders, setOrders] = useState(null);
   const [order, setOrder] = useState(null);
   const [user, setUser] = useState(null);
+  const [userImage, setUserImage] = useState(null);
 
   const fetchOrder = async (id) => {
     if (!id) {
@@ -19,6 +20,10 @@ const OrderContextProvider = ({ children }) => {
     const fetchedOrder = await DataStore.query(Order, id);
 
     const fetchedUser = await DataStore.query(User, fetchedOrder.userID);
+    Storage.get(`${fetchedUser.sub}.jpg`)
+      .then((mylink) => setUserImage(mylink))
+      .catch((e) => console.log(e));
+
     setOrder(fetchedOrder);
     setUser(fetchedUser);
   };
@@ -72,6 +77,7 @@ const OrderContextProvider = ({ children }) => {
         user,
         arrivedOrder,
         completeOrder,
+        userImage,
       }}
     >
       {children}

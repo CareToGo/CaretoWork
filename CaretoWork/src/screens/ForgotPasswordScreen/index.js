@@ -15,7 +15,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { Auth } from "aws-amplify";
 
-const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const EMAIL_REGEX =
+  /^(?!.*(?:\.-|-\.))[^@]+@[^\W_](?:[\w-]*[^\W_])?(?:\.[^\W_](?:[\w-]*[^\W_])?)+$/;
 
 const ForgotPasswordScreen = () => {
   const { control, handleSubmit } = useForm();
@@ -24,7 +25,7 @@ const ForgotPasswordScreen = () => {
   const onSignInPressed = () => {
     navigation.navigate("SignIn");
   };
-  
+
   const onSendPressed = async (data) => {
     try {
       await Auth.forgotPassword(data.username);
@@ -36,30 +37,30 @@ const ForgotPasswordScreen = () => {
 
   return (
     <SafeAreaView>
-        <View style={styles.root}>
-          <Text style={styles.title}>Reset Your Password</Text>
+      <View style={styles.root}>
+        <Text style={styles.title}>Reset Your Password</Text>
 
-          <CustomInput
-            name="username"
-            placeholder="Email"
-            control={control}
-            rules={{
-              required: "Email is required",
-              pattern: {
-                value: EMAIL_REGEX,
-                message: "This is not a valid Email",
-              },
-            }}
-          />
+        <CustomInput
+          name="username"
+          placeholder="Email"
+          control={control}
+          rules={{
+            required: "Email is required",
+            pattern: {
+              value: EMAIL_REGEX,
+              message: "This is not a valid Email",
+            },
+          }}
+        />
 
-          <CustomButton text="Send" onPress={handleSubmit(onSendPressed)} />
+        <CustomButton text="Send" onPress={handleSubmit(onSendPressed)} />
 
-          <CustomButton
-            text="Back to Sign in"
-            onPress={onSignInPressed}
-            type="TERTIARY"
-          />
-        </View>
+        <CustomButton
+          text="Back to Sign in"
+          onPress={onSignInPressed}
+          type="TERTIARY"
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "F9FBFC",
-    marginTop: '18%'
+    marginTop: "18%",
   },
   logo: {
     width: "70%",
